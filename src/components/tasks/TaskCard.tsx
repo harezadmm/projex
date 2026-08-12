@@ -62,7 +62,7 @@ export function TaskCard({
 }) {
   const accent = project ? ACCENT[project.color] : null;
   // Tab dan badan HARUS memakai kelas bg yang sama persis supaya menyatu mulus
-  const soft = accent?.soft ?? "bg-slate-100";
+  const soft = accent?.pastel ?? "bg-slate-100";
   const tabText = accent?.text ?? "text-slate-600";
   const idx = COLUMNS.indexOf(task.status);
   const due = dueTone(task.due_date, task.status);

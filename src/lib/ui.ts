@@ -7,15 +7,15 @@ import type { AccentColor, Priority, TaskStatus } from "./types";
  */
 export const ACCENT: Record<
   AccentColor,
-  { soft: string; text: string; dot: string; bar: string; hex: string }
+  { soft: string; pastel: string; text: string; dot: string; bar: string; hex: string }
 > = {
-  blue:   { soft: "bg-blue-50",   text: "text-blue-700",   dot: "bg-blue-500",   bar: "bg-blue-500",   hex: "#3b82f6" },
-  orange: { soft: "bg-orange-50", text: "text-orange-700", dot: "bg-orange-500", bar: "bg-orange-500", hex: "#f97316" },
-  green:  { soft: "bg-green-50",  text: "text-green-700",  dot: "bg-green-500",  bar: "bg-green-500",  hex: "#22c55e" },
-  pink:   { soft: "bg-pink-50",   text: "text-pink-700",   dot: "bg-pink-500",   bar: "bg-pink-500",   hex: "#ec4899" },
-  purple: { soft: "bg-purple-50", text: "text-purple-700", dot: "bg-purple-500", bar: "bg-purple-500", hex: "#a855f7" },
-  red:    { soft: "bg-red-50",    text: "text-red-700",    dot: "bg-red-500",    bar: "bg-red-500",    hex: "#ef4444" },
-  yellow: { soft: "bg-yellow-50", text: "text-yellow-700", dot: "bg-yellow-500", bar: "bg-yellow-500", hex: "#eab308" },
+  blue:   { soft: "bg-blue-50",   pastel: "bg-blue-100",   text: "text-blue-700",   dot: "bg-blue-500",   bar: "bg-blue-500",   hex: "#3b82f6" },
+  orange: { soft: "bg-orange-50", pastel: "bg-orange-100", text: "text-orange-700", dot: "bg-orange-500", bar: "bg-orange-500", hex: "#f97316" },
+  green:  { soft: "bg-green-50",  pastel: "bg-green-100",  text: "text-green-700",  dot: "bg-green-500",  bar: "bg-green-500",  hex: "#22c55e" },
+  pink:   { soft: "bg-pink-50",   pastel: "bg-pink-100",   text: "text-pink-700",   dot: "bg-pink-500",   bar: "bg-pink-500",   hex: "#ec4899" },
+  purple: { soft: "bg-purple-50", pastel: "bg-purple-100", text: "text-purple-700", dot: "bg-purple-500", bar: "bg-purple-500", hex: "#a855f7" },
+  red:    { soft: "bg-red-50",    pastel: "bg-red-100",    text: "text-red-700",    dot: "bg-red-500",    bar: "bg-red-500",    hex: "#ef4444" },
+  yellow: { soft: "bg-yellow-50", pastel: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-500", bar: "bg-yellow-500", hex: "#eab308" },
 };
 
 export const ACCENT_KEYS = Object.keys(ACCENT) as AccentColor[];
