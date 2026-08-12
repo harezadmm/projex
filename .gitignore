@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# catatan kerja lokal (tidak untuk repo)
+.claude/
+CLAUDE.md
+AGENTS.md
+LANJUTKAN.md

@@ -1,0 +1,70 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  LayoutGrid,
+  FolderKanban,
+  ListChecks,
+  Users,
+  ClipboardList,
+  GitCommitHorizontal,
+  FileText,
+  Settings,
+} from "lucide-react";
+import { cn } from "@/lib/cn";
+
+export const NAV_ITEMS = [
+  { href: "/", label: "Dashboard", icon: LayoutGrid },
+  { href: "/projects", label: "Proyek", icon: FolderKanban },
+  { href: "/tasks", label: "Tugas", icon: ListChecks },
+  { href: "/members", label: "Anggota", icon: Users },
+  { href: "/progress", label: "Catatan Progres", icon: ClipboardList },
+  { href: "/activity", label: "Aktivitas GitHub", icon: GitCommitHorizontal },
+  { href: "/report", label: "Laporan", icon: FileText },
+  { href: "/settings", label: "Pengaturan", icon: Settings },
+] as const;
+
+export function Sidebar() {
+  const pathname = usePathname();
+
+  return (
+    // Rail kaca tunggal membungkus semua ikon = satu permukaan backdrop-filter.
+    // z-30: kartu glass di <main> membuat stacking context sendiri dan datang
+    // belakangan di DOM, jadi tanpa z-index tooltip menu tertindih kartu.
+    // (Tangga z: konten < nav 30 < topbar 40 < modal 50.)
+    <nav
+      aria-label="Navigasi utama"
+      className="no-print glass relative z-30 flex shrink-0 flex-row gap-1.5 rounded-3xl p-2 overflow-x-auto lg:flex-col lg:self-start lg:overflow-visible"
+    >
+      {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
+
+        return (
+          <Link
+            key={href}
+            href={href}
+            aria-label={label}
+            aria-current={active ? "page" : undefined}
+            className={cn(
+              "group relative grid size-11 shrink-0 place-items-center rounded-2xl transition",
+              active
+                ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20"
+                : "text-slate-400 hover:bg-white/80 hover:text-slate-700"
+            )}
+          >
+            <Icon className="size-5" strokeWidth={active ? 2.2 : 1.9} />
+
+            {/* Tooltip nama menu, muncul saat hover di layar lebar */}
+            <span
+              role="tooltip"
+              className="pointer-events-none absolute left-full z-30 ml-3 hidden whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 lg:block"
+            >
+              {label}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

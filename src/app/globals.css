@@ -1,26 +1,169 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --ink: #0f172a;
+  --muted: #64748b;
+  --panel: #eef2f9;
+
+  /* Token liquid glass — satu sumber supaya semua permukaan konsisten */
+  --glass-bg: rgb(255 255 255 / 0.58);
+  --glass-bg-strong: rgb(255 255 255 / 0.8);
+  --glass-border: rgb(255 255 255 / 0.65);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.75);
+  --glass-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px -16px rgb(15 23 42 / 0.18);
+}
+
+html,
+body {
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--panel);
+}
+
+/*
+  Lapisan ambient di belakang glass: blob warna lembut yang diblur oleh
+  backdrop-filter kartu di atasnya — tanpa ini efek kaca tidak terlihat.
+  Dipasang sebagai ::before fixed (bukan background-attachment: fixed yang
+  memicu repaint saat scroll di sebagian browser): digambar sekali, lalu
+  hanya di-composite oleh GPU.
+*/
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -10;
+  pointer-events: none;
+  background:
+    radial-gradient(640px 480px at 8% -4%, rgb(255 214 165 / 0.5), transparent 62%),
+    radial-gradient(760px 560px at 96% 4%, rgb(167 199 255 / 0.55), transparent 60%),
+    radial-gradient(720px 640px at 82% 92%, rgb(196 181 253 / 0.42), transparent 62%),
+    radial-gradient(560px 480px at 4% 88%, rgb(165 232 255 / 0.45), transparent 60%);
+}
+
+/* Scrollbar tipis supaya tidak mengganggu tampilan kartu */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Ring fokus keyboard yang konsisten di semua kontrol */
+:focus-visible {
+  outline: 2px solid rgb(37 99 235 / 0.55);
+  outline-offset: 2px;
+}
+
+/*
+  ---------- Permukaan liquid glass ----------
+  `card`  : permukaan utama (section, panel) — translusen + blur.
+  `glass` : bar/rail layout (topbar, sidebar).
+  `glass-strong` : lapisan melayang (modal, dropdown) — lebih pekat
+                   supaya teks tetap terbaca di atas konten apa pun.
+
+  Catatan performa: backdrop-filter dirender per elemen oleh GPU. Utility
+  ini HANYA untuk permukaan besar yang jumlahnya belasan per halaman.
+  Item yang dirender massal (kartu Kanban, baris catatan, baris commit)
+  sengaja memakai latar solid — jangan diberi blur.
+*/
+@utility card {
+  border-radius: 1.5rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  backdrop-filter: blur(20px) saturate(160%);
+  box-shadow: var(--glass-highlight), var(--glass-shadow);
+}
+
+@utility glass-strong {
+  background: var(--glass-bg-strong);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: blur(28px) saturate(170%);
+  backdrop-filter: blur(28px) saturate(170%);
+  box-shadow: var(--glass-highlight), 0 24px 48px -20px rgb(15 23 42 / 0.28);
+}
+
+/* Browser tanpa backdrop-filter: pekatkan latar supaya tetap terbaca */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .card,
+  .glass,
+  .glass-strong {
+    background: rgb(255 255 255 / 0.94);
+  }
+}
+
+/* Hormati preferensi aksesibilitas "kurangi transparansi" */
+@media (prefers-reduced-transparency: reduce) {
+  .card,
+  .glass,
+  .glass-strong {
+    background: #fff;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  body::before {
+    display: none;
+  }
+}
+
+/* ---------- Mode cetak: dipakai halaman Laporan ---------- */
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  body::before {
+    display: none;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-plain,
+  .card,
+  .glass,
+  .glass-strong {
+    background: #fff !important;
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 8px !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  .print-break {
+    break-inside: avoid;
+  }
+
+  @page {
+    margin: 14mm;
+  }
 }
