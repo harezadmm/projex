@@ -105,29 +105,29 @@ export default function ReportPage() {
 
       {loading ? (
         <Card>
-          <p className="py-12 text-center text-sm text-slate-500">Memuat data…</p>
+          <p className="py-12 text-center text-sm text-muted">Memuat data…</p>
         </Card>
       ) : (
         <div className="flex flex-col gap-4">
           {/* ---------- Kop laporan ---------- */}
           <Card>
-            <div className="border-b border-slate-200 pb-4 text-center">
-              <h1 className="text-2xl font-bold text-slate-900">
+            <div className="border-b border-line pb-4 text-center">
+              <h1 className="text-2xl font-bold text-ink">
                 Laporan Progres Proyek
               </h1>
-              <p className="mt-1 text-sm text-slate-600">{settings.groupName}</p>
+              <p className="mt-1 text-sm text-ink-2">{settings.groupName}</p>
               {settings.courseName && (
-                <p className="text-sm text-slate-600">{settings.courseName}</p>
+                <p className="text-sm text-ink-2">{settings.courseName}</p>
               )}
               {settings.lecturerName && (
-                <p className="text-sm text-slate-600">
+                <p className="text-sm text-ink-2">
                   Dosen Pengampu: {settings.lecturerName}
                 </p>
               )}
               {settings.institution && (
-                <p className="text-sm text-slate-600">{settings.institution}</p>
+                <p className="text-sm text-ink-2">{settings.institution}</p>
               )}
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-faint">
                 Dicetak {formatDate(printedAt.toISOString())} pukul{" "}
                 {printedAt.toLocaleTimeString("id-ID", {
                   hour: "2-digit",
@@ -144,9 +144,9 @@ export default function ReportPage() {
                 ["Belum mulai", totals.todo],
                 ["Jam tercatat", totals.hours.toFixed(1)],
               ].map(([label, value]) => (
-                <div key={String(label)} className="rounded-2xl bg-slate-50 p-3 text-center">
-                  <dt className="text-xs text-slate-500">{label}</dt>
-                  <dd className="text-xl font-bold text-slate-900">{value}</dd>
+                <div key={String(label)} className="rounded-2xl bg-surface-2 p-3 text-center">
+                  <dt className="text-xs text-muted">{label}</dt>
+                  <dd className="text-xl font-bold text-ink">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -158,7 +158,7 @@ export default function ReportPage() {
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                  <tr className="border-b border-line text-left text-xs text-muted">
                     <th className="pb-2 font-medium">Nama</th>
                     <th className="pb-2 font-medium">Peran</th>
                     <th className="pb-2 text-center font-medium">Tugas</th>
@@ -171,7 +171,7 @@ export default function ReportPage() {
                 </thead>
                 <tbody>
                   {rows.map((r) => (
-                    <tr key={r.member.id} className="border-b border-slate-100 last:border-0">
+                    <tr key={r.member.id} className="border-b border-line last:border-0">
                       <td className="py-2.5">
                         <div className="flex items-center gap-2.5">
                           <Avatar
@@ -179,31 +179,31 @@ export default function ReportPage() {
                             color={r.member.avatar_color}
                             size="sm"
                           />
-                          <span className="font-medium text-slate-900">
+                          <span className="font-medium text-ink">
                             {r.member.name}
                             {r.member.is_lead && (
-                              <span className="ml-1.5 text-xs text-amber-600">(Ketua)</span>
+                              <span className="ml-1.5 text-xs text-[var(--tone-amber-text)]">(Ketua)</span>
                             )}
                           </span>
                         </div>
                       </td>
-                      <td className="py-2.5 text-slate-600">{r.member.role}</td>
-                      <td className="py-2.5 text-center text-slate-700">{r.total}</td>
-                      <td className="py-2.5 text-center text-slate-700">{r.done}</td>
-                      <td className="py-2.5 text-center font-semibold text-slate-900">
+                      <td className="py-2.5 text-ink-2">{r.member.role}</td>
+                      <td className="py-2.5 text-center text-ink-2">{r.total}</td>
+                      <td className="py-2.5 text-center text-ink-2">{r.done}</td>
+                      <td className="py-2.5 text-center font-semibold text-ink">
                         {r.pct}%
                       </td>
-                      <td className="py-2.5 text-center text-slate-700">{r.logs}</td>
-                      <td className="py-2.5 text-center text-slate-700">
+                      <td className="py-2.5 text-center text-ink-2">{r.logs}</td>
+                      <td className="py-2.5 text-center text-ink-2">
                         {r.hours.toFixed(1)}
                       </td>
-                      <td className="py-2.5 text-center text-slate-700">{r.commits}</td>
+                      <td className="py-2.5 text-center text-ink-2">{r.commits}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            <p className="mt-3 text-xs text-slate-400">
+            <p className="mt-3 text-xs text-faint">
               Kolom Commit diambil langsung dari GitHub ({days} hari terakhir) dan
               dicocokkan lewat username GitHub tiap anggota.
             </p>
@@ -220,8 +220,8 @@ export default function ReportPage() {
                 return (
                   <section key={project.id} className="print-break">
                     <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
-                      <h3 className="font-semibold text-slate-900">{project.name}</h3>
-                      <span className="text-xs text-slate-500">
+                      <h3 className="font-semibold text-ink">{project.name}</h3>
+                      <span className="text-xs text-muted">
                         {PROJECT_STATUS_LABEL[project.status]} · {doneCount}/{own.length}{" "}
                         selesai ({percent(doneCount, own.length)}%) · Deadline{" "}
                         {formatDate(project.deadline)}
@@ -229,12 +229,12 @@ export default function ReportPage() {
                     </div>
 
                     {own.length === 0 ? (
-                      <p className="text-sm text-slate-400">Belum ada tugas.</p>
+                      <p className="text-sm text-faint">Belum ada tugas.</p>
                     ) : (
                       <div className="overflow-x-auto">
                         <table className="w-full min-w-[560px] text-sm">
                           <thead>
-                            <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                            <tr className="border-b border-line text-left text-xs text-muted">
                               <th className="pb-2 font-medium">Tugas</th>
                               <th className="pb-2 font-medium">Penanggung jawab</th>
                               <th className="pb-2 font-medium">Status</th>
@@ -248,21 +248,21 @@ export default function ReportPage() {
                               return (
                                 <tr
                                   key={t.id}
-                                  className="border-b border-slate-100 last:border-0"
+                                  className="border-b border-line last:border-0"
                                 >
-                                  <td className="py-2 text-slate-800">{t.title}</td>
-                                  <td className="py-2 text-slate-600">
+                                  <td className="py-2 text-ink">{t.title}</td>
+                                  <td className="py-2 text-ink-2">
                                     {member?.name ?? "—"}
                                   </td>
                                   <td className="py-2">
-                                    <span className="text-slate-600">
+                                    <span className="text-ink-2">
                                       {STATUS_STYLE[t.status].label}
                                     </span>
                                   </td>
-                                  <td className="py-2 text-slate-600">
+                                  <td className="py-2 text-ink-2">
                                     {formatDate(t.due_date)}
                                   </td>
-                                  <td className="py-2 text-slate-600">
+                                  <td className="py-2 text-ink-2">
                                     {formatDate(t.completed_at)}
                                   </td>
                                 </tr>
@@ -276,7 +276,7 @@ export default function ReportPage() {
                 );
               })}
               {projects.length === 0 && (
-                <p className="text-sm text-slate-400">Belum ada proyek.</p>
+                <p className="text-sm text-faint">Belum ada proyek.</p>
               )}
             </div>
           </Card>
@@ -285,12 +285,12 @@ export default function ReportPage() {
           <Card className="print-break">
             <CardHeader title="3. Riwayat Catatan Progres" />
             {logs.length === 0 ? (
-              <p className="text-sm text-slate-400">Belum ada catatan progres.</p>
+              <p className="text-sm text-faint">Belum ada catatan progres.</p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                    <tr className="border-b border-line text-left text-xs text-muted">
                       <th className="pb-2 font-medium">Tanggal</th>
                       <th className="pb-2 font-medium">Anggota</th>
                       <th className="pb-2 font-medium">Tugas</th>
@@ -308,20 +308,20 @@ export default function ReportPage() {
                         return (
                           <tr
                             key={log.id}
-                            className="border-b border-slate-100 last:border-0"
+                            className="border-b border-line last:border-0"
                           >
-                            <td className="py-2 whitespace-nowrap text-slate-600">
+                            <td className="py-2 whitespace-nowrap text-ink-2">
                               {formatDate(log.created_at)}
                             </td>
-                            <td className="py-2 whitespace-nowrap text-slate-800">
+                            <td className="py-2 whitespace-nowrap text-ink">
                               {member?.name ?? "—"}
                             </td>
-                            <td className="py-2 text-slate-600">{task?.title ?? "—"}</td>
-                            <td className="py-2 text-slate-700">{log.note}</td>
-                            <td className="py-2 text-center text-slate-600">
+                            <td className="py-2 text-ink-2">{task?.title ?? "—"}</td>
+                            <td className="py-2 text-ink-2">{log.note}</td>
+                            <td className="py-2 text-center text-ink-2">
                               {log.percent}%
                             </td>
-                            <td className="py-2 text-center text-slate-600">
+                            <td className="py-2 text-center text-ink-2">
                               {Number(log.hours_spent).toFixed(1)}
                             </td>
                           </tr>
@@ -337,18 +337,18 @@ export default function ReportPage() {
           <Card className="print-break">
             <CardHeader title="4. Bukti Commit GitHub" />
             {!repoUrl ? (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-faint">
                 Belum ada repo GitHub yang terhubung, jadi bagian ini kosong.
               </p>
             ) : commits.length === 0 ? (
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-faint">
                 Tidak ada commit dalam {days} hari terakhir (atau repo belum bisa diakses).
               </p>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[640px] text-sm">
                   <thead>
-                    <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
+                    <tr className="border-b border-line text-left text-xs text-muted">
                       <th className="pb-2 font-medium">Tanggal</th>
                       <th className="pb-2 font-medium">Author</th>
                       <th className="pb-2 font-medium">Pesan commit</th>
@@ -357,15 +357,15 @@ export default function ReportPage() {
                   </thead>
                   <tbody>
                     {commits.map((c) => (
-                      <tr key={c.sha} className="border-b border-slate-100 last:border-0">
-                        <td className="py-2 whitespace-nowrap text-slate-600">
+                      <tr key={c.sha} className="border-b border-line last:border-0">
+                        <td className="py-2 whitespace-nowrap text-ink-2">
                           {formatDate(c.date)}
                         </td>
-                        <td className="py-2 whitespace-nowrap text-slate-800">
+                        <td className="py-2 whitespace-nowrap text-ink">
                           {c.author_login ?? c.author_name}
                         </td>
-                        <td className="py-2 text-slate-700">{c.message}</td>
-                        <td className="py-2 font-mono text-xs text-slate-500">
+                        <td className="py-2 text-ink-2">{c.message}</td>
+                        <td className="py-2 font-mono text-xs text-muted">
                           {c.sha.slice(0, 7)}
                         </td>
                       </tr>

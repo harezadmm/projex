@@ -44,8 +44,8 @@ export function ProjectsOverviewCard() {
 
       <div className="relative mx-auto aspect-square w-full max-w-[220px]">
         {total === 0 ? (
-          <div className="grid h-full place-items-center rounded-full border-[18px] border-slate-100">
-            <span className="text-xs text-slate-400">Belum ada tugas</span>
+          <div className="grid h-full place-items-center rounded-full border-[18px] border-line">
+            <span className="text-xs text-faint">Belum ada tugas</span>
           </div>
         ) : (
           <>
@@ -70,8 +70,8 @@ export function ProjectsOverviewCard() {
             </ResponsiveContainer>
 
             <div className="pointer-events-none absolute inset-0 grid place-content-center text-center">
-              <span className="text-3xl font-bold text-slate-900">{donePct}%</span>
-              <span className="text-xs text-slate-500">selesai</span>
+              <span className="text-3xl font-bold text-ink">{donePct}%</span>
+              <span className="text-xs text-muted">selesai</span>
             </div>
           </>
         )}
@@ -84,8 +84,8 @@ export function ProjectsOverviewCard() {
               className="size-2.5 rounded-full"
               style={{ backgroundColor: s.color }}
             />
-            <span className="text-slate-600">
-              {s.name}: <span className="font-semibold text-slate-900">{s.value}</span>
+            <span className="text-ink-2">
+              {s.name}: <span className="font-semibold text-ink">{s.value}</span>
             </span>
           </li>
         ))}
@@ -93,7 +93,7 @@ export function ProjectsOverviewCard() {
 
       <Link
         href="/projects"
-        className="mt-auto pt-4 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        className="mt-auto pt-4 text-sm font-medium text-ink-2 transition hover:text-ink"
       >
         Kelola proyek →
       </Link>

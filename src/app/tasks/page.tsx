@@ -91,7 +91,8 @@ export default function TasksPage() {
 
   async function handleSubmit(values: TaskFormValues) {
     if (editing) await updateTask(editing.id, values);
-    else await addTask(values);
+    // Tugas yang dibuat lewat form ini manual, bukan turunan branch GitHub.
+    else await addTask({ ...values, source_repo: null, source_branch: null });
     setModalOpen(false);
   }
 
@@ -132,11 +133,11 @@ export default function TasksPage() {
             <div className="min-w-0 lg:flex-1">
               <div className="flex items-center gap-2.5">
                 <span className={cn("size-2.5 shrink-0 rounded-full", bannerAccent.dot)} />
-                <h2 className="truncate text-xl font-bold tracking-tight text-slate-900">
+                <h2 className="truncate text-xl font-bold tracking-tight text-ink">
                   {bannerProject?.name ?? "Semua Proyek"}
                 </h2>
               </div>
-              <p className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+              <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
                 <CalendarDays className="size-4 shrink-0" />
                 {bannerProject
                   ? `Deadline: ${formatDate(bannerProject.deadline)}`
@@ -144,13 +145,13 @@ export default function TasksPage() {
               </p>
 
               <div className="mt-4 flex max-w-md items-center gap-3">
-                <div className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-slate-900/10">
+                <div className="h-2 min-w-0 flex-1 overflow-hidden rounded-full bg-ink/10">
                   <div
                     className={cn("h-full rounded-full transition-all", bannerAccent.bar)}
                     style={{ width: `${bannerPct}%` }}
                   />
                 </div>
-                <span className="shrink-0 text-sm font-semibold text-slate-700">
+                <span className="shrink-0 text-sm font-semibold text-ink-2">
                   {bannerPct}% selesai
                 </span>
               </div>
@@ -165,20 +166,20 @@ export default function TasksPage() {
                       name={m.name}
                       color={m.avatar_color}
                       size="sm"
-                      className="ring-2 ring-white"
+                      className="ring-2 ring-surface"
                     />
                   ))}
                   {summary.memberIds.length > stackMembers.length && (
-                    <span className="grid size-8 place-items-center rounded-full bg-slate-900 text-[11px] font-semibold text-white ring-2 ring-white">
+                    <span className="grid size-8 place-items-center rounded-full bg-inverse text-[11px] font-semibold text-on-inverse ring-2 ring-surface">
                       +{summary.memberIds.length - stackMembers.length}
                     </span>
                   )}
                 </div>
               )}
-              <div className="rounded-2xl bg-slate-900 px-4 py-2.5 text-white shadow-md shadow-slate-900/20">
-                <p className="text-[11px] font-medium text-slate-300">Tugas selesai</p>
+              <div className="rounded-2xl bg-inverse px-4 py-2.5 text-on-inverse shadow-md shadow-black/25">
+                <p className="text-[11px] font-medium text-faint">Tugas selesai</p>
                 <p className="text-sm font-bold">
-                  {summary.done} <span className="font-medium text-slate-300">dari {summary.total}</span>
+                  {summary.done} <span className="font-medium text-faint">dari {summary.total}</span>
                 </p>
               </div>
             </div>
@@ -239,7 +240,7 @@ export default function TasksPage() {
                 key={status}
                 className={cn(
                   "rounded-3xl p-2 transition",
-                  dragOver === status && "bg-white/50 ring-2 ring-slate-900/10"
+                  dragOver === status && "bg-surface/50 ring-2 ring-ink/15"
                 )}
                 onDragOver={(e: React.DragEvent) => {
                   e.preventDefault();
@@ -260,10 +261,10 @@ export default function TasksPage() {
                     <span
                       className={cn("size-2 shrink-0 rounded-full", STATUS_STYLE[status].dot)}
                     />
-                    <h2 className="truncate text-sm font-semibold text-slate-700">
+                    <h2 className="truncate text-sm font-semibold text-ink-2">
                       {STATUS_STYLE[status].label}
                     </h2>
-                    <span className="text-xs font-semibold text-slate-400">
+                    <span className="text-xs font-semibold text-faint">
                       ({list.length})
                     </span>
                   </div>
@@ -271,14 +272,14 @@ export default function TasksPage() {
                     type="button"
                     onClick={() => openCreate(status)}
                     aria-label={`Tambah tugas ke kolom ${STATUS_STYLE[status].label}`}
-                    className="no-print grid size-8 shrink-0 place-items-center rounded-full bg-slate-900/5 text-slate-600 transition hover:bg-slate-900/10 hover:text-slate-900"
+                    className="no-print grid size-8 shrink-0 place-items-center rounded-full bg-ink/5 text-ink-2 transition hover:bg-ink/10 hover:text-ink"
                   >
                     <Plus className="size-4" />
                   </button>
                 </header>
 
                 {list.length === 0 ? (
-                  <p className="rounded-2xl border-2 border-dashed border-slate-200/80 bg-white/30 px-4 py-10 text-center text-sm text-slate-400">
+                  <p className="rounded-2xl border-2 border-dashed border-line/80 bg-surface/30 px-4 py-10 text-center text-sm text-faint">
                     Tarik tugas ke sini, atau tambahkan yang baru.
                   </p>
                 ) : (
@@ -309,10 +310,10 @@ export default function TasksPage() {
                         onClick={() =>
                           setShown((s) => ({ ...s, [status]: s[status] + PER_COLUMN }))
                         }
-                        className="no-print mt-3 w-full rounded-2xl border border-white/70 bg-white/60 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-white/90"
+                        className="no-print mt-3 w-full rounded-2xl border border-white/70 bg-surface/60 py-2.5 text-sm font-medium text-ink-2 transition hover:bg-surface/90"
                       >
                         Tampilkan {Math.min(PER_COLUMN, list.length - limit)} lagi
-                        <span className="text-slate-400"> · sisa {list.length - limit}</span>
+                        <span className="text-faint"> · sisa {list.length - limit}</span>
                       </button>
                     )}
                   </>

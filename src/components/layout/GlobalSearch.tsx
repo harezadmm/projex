@@ -73,7 +73,7 @@ export function GlobalSearch() {
 
   return (
     <div ref={boxRef} className="no-print relative w-full lg:max-w-lg">
-      <Search className="pointer-events-none absolute top-1/2 left-5 size-[18px] -translate-y-1/2 text-slate-400" />
+      <Search className="pointer-events-none absolute top-1/2 left-5 size-[18px] -translate-y-1/2 text-faint" />
       <input
         type="search"
         value={query}
@@ -84,13 +84,13 @@ export function GlobalSearch() {
         onFocus={() => setOpen(true)}
         placeholder="Cari tugas, proyek, atau anggota..."
         aria-label="Pencarian"
-        className="glass w-full rounded-full py-3.5 pr-5 pl-13 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:bg-white/85"
+        className="glass w-full rounded-full py-3.5 pr-5 pl-13 text-sm text-ink outline-none transition placeholder:text-faint focus:bg-surface/85"
       />
 
       {open && query.trim().length >= 2 && (
         <div className="glass-strong absolute top-full right-0 left-0 z-40 mt-2 overflow-hidden rounded-2xl p-2">
           {hits.length === 0 ? (
-            <p className="px-3 py-4 text-sm text-slate-500">
+            <p className="px-3 py-4 text-sm text-muted">
               Tidak ada hasil untuk “{query}”.
             </p>
           ) : (
@@ -99,17 +99,17 @@ export function GlobalSearch() {
                 key={`${hit.kind}-${hit.title}-${i}`}
                 href={hit.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition hover:bg-white/80"
+                className="flex items-center justify-between gap-3 rounded-xl px-3 py-2.5 transition hover:bg-surface/80"
               >
                 <span className="min-w-0">
-                  <span className="block truncate text-sm font-medium text-slate-800">
+                  <span className="block truncate text-sm font-medium text-ink">
                     {hit.title}
                   </span>
-                  <span className="block truncate text-xs text-slate-500">
+                  <span className="block truncate text-xs text-muted">
                     {hit.subtitle}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                <span className="shrink-0 rounded-full bg-surface-3 px-2 py-0.5 text-[11px] font-medium text-muted">
                   {hit.kind}
                 </span>
               </Link>

@@ -72,8 +72,8 @@ export function MyTasksCard() {
             className={cn(
               "rounded-full px-4 py-2 text-sm font-medium transition",
               tab === key
-                ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                ? "bg-inverse text-on-inverse"
+                : "bg-surface-3 text-ink-2 hover:bg-line"
             )}
           >
             {label}
@@ -81,16 +81,16 @@ export function MyTasksCard() {
         ))}
       </div>
 
-      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-slate-200 px-3 py-2.5">
-        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-slate-900 text-xs font-semibold text-white">
+      <div className="mb-4 flex items-center gap-3 rounded-2xl border border-line px-3 py-2.5">
+        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-inverse text-xs font-semibold text-on-inverse">
           {mine.length}
         </span>
-        <span className="text-sm font-medium text-slate-700">Tugas Berjalan</span>
+        <span className="text-sm font-medium text-ink-2">Tugas Berjalan</span>
       </div>
 
       <div className="-mr-1 flex max-h-[26rem] flex-1 flex-col gap-3 overflow-y-auto pr-1">
         {visible.length === 0 && (
-          <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+          <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">
             {tab === "today"
               ? "Tidak ada tugas yang jatuh tempo hari ini. Aman!"
               : "Belum ada tugas mendatang."}
@@ -111,21 +111,21 @@ export function MyTasksCard() {
                   onClick={() => updateTask(task.id, { status: "done" })}
                   aria-label={`Tandai "${task.title}" selesai`}
                   title="Tandai selesai"
-                  className="grid size-6 shrink-0 place-items-center rounded-full border-2 border-slate-300 bg-white text-transparent transition hover:border-green-500 hover:text-green-600"
+                  className="grid size-6 shrink-0 place-items-center rounded-full border-2 border-line-2 bg-surface text-transparent transition hover:border-green-500 hover:text-[var(--tone-green-text)]"
                 >
                   <Check className="size-3.5" strokeWidth={3} />
                 </button>
               </div>
 
-              <h3 className="mt-2 text-sm leading-snug font-semibold text-slate-900">
+              <h3 className="mt-2 text-sm leading-snug font-semibold text-ink">
                 {task.title}
               </h3>
               {task.description && (
-                <p className="mt-1 line-clamp-2 text-xs text-slate-500">
+                <p className="mt-1 line-clamp-2 text-xs text-muted">
                   {task.description}
                 </p>
               )}
-              <p className="mt-2 text-xs font-medium text-slate-400">
+              <p className="mt-2 text-xs font-medium text-faint">
                 {relativeDays(task.due_date)}
               </p>
             </article>
@@ -135,7 +135,7 @@ export function MyTasksCard() {
 
       <Link
         href="/tasks"
-        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-ink-2 transition hover:text-ink"
       >
         Lihat semua tugas →
       </Link>

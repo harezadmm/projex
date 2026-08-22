@@ -1,4 +1,4 @@
-import type { Member, Project, Task, ProgressLog } from "./types";
+import type { Member, Project, Task, ProgressLog, BranchReview } from "./types";
 
 /** Tanggal relatif terhadap hari ini, dalam format ISO. */
 function daysFromNow(n: number): string {
@@ -21,6 +21,7 @@ export function buildSeedData(): {
   projects: Project[];
   tasks: Task[];
   logs: ProgressLog[];
+  reviews: BranchReview[];
 } {
   const members: Member[] = [
     {
@@ -135,6 +136,9 @@ export function buildSeedData(): {
       due_date: dateOnly(due),
       created_at: daysFromNow(due - 14),
       completed_at: status === "done" ? daysFromNow(due) : null,
+      // Semua tugas contoh dibuat manual, bukan turunan branch GitHub.
+      source_repo: null,
+      source_branch: null,
     })
   );
 
@@ -165,5 +169,7 @@ export function buildSeedData(): {
     }
   );
 
-  return { members, projects, tasks, logs };
+  // Tinjauan branch selalu mulai kosong: isinya berasal dari repo sungguhan
+  // saat halaman Project Manager melakukan sinkronisasi.
+  return { members, projects, tasks, logs, reviews: [] };
 }

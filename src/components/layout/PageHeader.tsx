@@ -15,8 +15,8 @@ export function PageHeader({
   return (
     <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
       <div>
-        <p className="text-sm text-slate-500">{eyebrow}</p>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+        <p className="text-sm text-muted">{eyebrow}</p>
+        <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl">
           {title}
         </h1>
       </div>

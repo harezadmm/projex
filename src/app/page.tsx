@@ -3,48 +3,67 @@
 import { useStore } from "@/lib/store";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import { StatTiles } from "@/components/dashboard/StatTiles";
+import { ProductivityHeatmap } from "@/components/dashboard/ProductivityHeatmap";
+import { TeamPerformanceCard } from "@/components/dashboard/TeamPerformanceCard";
 import { MyTasksCard } from "@/components/dashboard/MyTasksCard";
-import { ProjectsOverviewCard } from "@/components/dashboard/ProjectsOverviewCard";
 import { ActivityChartCard } from "@/components/dashboard/ActivityChartCard";
-import { ProjectProgressCard } from "@/components/dashboard/ProjectProgressCard";
 import { DeadlinesCard } from "@/components/dashboard/DeadlinesCard";
 import { RecentUpdatesCard } from "@/components/dashboard/RecentUpdatesCard";
 
 export default function DashboardPage() {
   const { loading } = useStore();
 
+  if (loading) {
+    return (
+      <>
+        <PageHeader eyebrow="Kelola dan pantau proyek kelompokmu" title="Dashboard" />
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            {Array.from({ length: 5 }, (_, i) => (
+              <CardSkeleton key={i} className="h-28" />
+            ))}
+          </div>
+          <CardSkeleton className="h-52" />
+          <div className="grid gap-4 lg:grid-cols-12">
+            <CardSkeleton className="lg:col-span-8" />
+            <CardSkeleton className="lg:col-span-4" />
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
-      <PageHeader eyebrow="Kelola dan pantau proyek kelompokmu" title="Project Dashboard" />
+      <PageHeader eyebrow="Kelola dan pantau proyek kelompokmu" title="Dashboard" />
 
-      {loading ? (
+      <div className="flex flex-col gap-4">
+        {/* Baris ringkasan: keadaan seluruh pekerjaan dalam sekali lihat */}
+        <StatTiles />
+
+        {/* Ritme kerja tim sepanjang tahun */}
+        <ProductivityHeatmap />
+
         <div className="grid gap-4 lg:grid-cols-12">
-          <CardSkeleton className="lg:col-span-3 lg:row-span-2" />
-          <CardSkeleton className="lg:col-span-3" />
-          <CardSkeleton className="lg:col-span-3" />
-          <CardSkeleton className="lg:col-span-3 lg:row-span-2" />
-          <CardSkeleton className="lg:col-span-6" />
-        </div>
-      ) : (
-        <div className="grid gap-4 lg:grid-cols-12">
-          <div className="lg:col-span-3 lg:row-span-2">
+          <div className="lg:col-span-8">
+            <TeamPerformanceCard />
+          </div>
+          <div className="flex flex-col gap-4 lg:col-span-4">
+            <DeadlinesCard />
             <MyTasksCard />
           </div>
-          <div className="lg:col-span-3">
-            <ProjectsOverviewCard />
-          </div>
-          <div className="lg:col-span-3">
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-12">
+          <div className="lg:col-span-7">
             <ActivityChartCard />
           </div>
-          <div className="flex flex-col gap-4 lg:col-span-3 lg:row-span-2">
-            <DeadlinesCard />
+          <div className="lg:col-span-5">
             <RecentUpdatesCard />
           </div>
-          <div className="lg:col-span-6">
-            <ProjectProgressCard />
-          </div>
         </div>
-      )}
+      </div>
     </>
   );
 }

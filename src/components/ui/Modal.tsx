@@ -35,7 +35,7 @@ export function Modal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 backdrop-blur-sm sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 backdrop-blur-sm sm:p-8">
       {/* lapisan penutup: klik di luar kartu untuk menutup */}
       <button
         type="button"
@@ -50,12 +50,12 @@ export function Modal({
         className="glass-strong relative z-10 my-auto w-full max-w-lg rounded-3xl p-6"
       >
         <div className="mb-5 flex items-center justify-between gap-4">
-          <h2 className="text-lg font-semibold text-slate-900">{title}</h2>
+          <h2 className="text-lg font-semibold text-ink">{title}</h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Tutup"
-            className="grid size-8 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+            className="grid size-8 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
           >
             <X className="size-4" />
           </button>

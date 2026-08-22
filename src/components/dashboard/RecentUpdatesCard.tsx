@@ -37,7 +37,7 @@ export function RecentUpdatesCard() {
       />
 
       {recent.length === 0 ? (
-        <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+        <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">
           Belum ada catatan progres.{" "}
           <Link href="/progress" className="font-medium underline">
             Tulis update pertama
@@ -47,25 +47,25 @@ export function RecentUpdatesCard() {
       ) : (
         <ul className="flex flex-col gap-3">
           {recent.map(({ log, member, task }) => (
-            <li key={log.id} className="rounded-2xl bg-slate-50 p-3.5">
+            <li key={log.id} className="rounded-2xl bg-surface-2 p-3.5">
               <div className="flex items-start gap-3">
                 {member ? (
                   <Avatar name={member.name} color={member.avatar_color} size="sm" />
                 ) : (
-                  <span className="size-8 shrink-0 rounded-full bg-slate-200" />
+                  <span className="size-8 shrink-0 rounded-full bg-line" />
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-baseline justify-between gap-2">
-                    <p className="truncate text-sm font-semibold text-slate-900">
+                    <p className="truncate text-sm font-semibold text-ink">
                       {member?.name ?? "Anonim"}
                     </p>
-                    <span className="shrink-0 text-xs text-slate-400">
+                    <span className="shrink-0 text-xs text-faint">
                       {relativeDays(log.created_at)}
                     </span>
                   </div>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-slate-600">{log.note}</p>
+                  <p className="mt-0.5 line-clamp-2 text-xs text-ink-2">{log.note}</p>
                   {task && (
-                    <p className="mt-1 truncate text-xs text-slate-400">
+                    <p className="mt-1 truncate text-xs text-faint">
                       pada: {task.title}
                     </p>
                   )}
@@ -73,13 +73,13 @@ export function RecentUpdatesCard() {
               </div>
 
               <div className="mt-2.5 flex items-center gap-3">
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-200">
+                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-line">
                   <div
-                    className="h-full rounded-full bg-slate-900"
+                    className="h-full rounded-full bg-inverse"
                     style={{ width: `${log.percent}%` }}
                   />
                 </div>
-                <span className="shrink-0 text-xs font-semibold text-slate-700">
+                <span className="shrink-0 text-xs font-semibold text-ink-2">
                   {log.percent}%
                 </span>
               </div>
@@ -90,7 +90,7 @@ export function RecentUpdatesCard() {
 
       <Link
         href="/progress"
-        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-ink-2 transition hover:text-ink"
       >
         Lihat semua catatan <ChevronRight className="size-4" />
       </Link>

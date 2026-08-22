@@ -12,7 +12,7 @@ import {
 } from "react";
 import { supabase, isSupabaseConfigured } from "./supabase";
 import { buildSeedData } from "./seed";
-import type { Member, Project, Task, ProgressLog } from "./types";
+import type { Member, Project, Task, ProgressLog, BranchReview } from "./types";
 
 const STORAGE_KEY = "projex-data-v1";
 const CURRENT_MEMBER_KEY = "projex-current-member";
@@ -29,12 +29,14 @@ interface Dataset {
   projects: Project[];
   tasks: Task[];
   logs: ProgressLog[];
+  reviews: BranchReview[];
 }
 
 type NewMember = Omit<Member, "id" | "created_at">;
 type NewProject = Omit<Project, "id" | "created_at">;
 type NewTask = Omit<Task, "id" | "created_at" | "completed_at">;
 type NewLog = Omit<ProgressLog, "id" | "created_at">;
+type NewReview = Omit<BranchReview, "id" | "created_at">;
 
 interface StoreValue extends Dataset {
   loading: boolean;
@@ -61,11 +63,19 @@ interface StoreValue extends Dataset {
 
   addLog: (l: NewLog) => Promise<void>;
   deleteLog: (id: string) => Promise<void>;
+
+  addReview: (r: NewReview) => Promise<void>;
+  updateReview: (id: string, patch: Partial<BranchReview>) => Promise<void>;
+  /**
+   * Buat baris tinjauan hanya kalau repo+branch itu belum punya. Dipakai
+   * sinkronisasi branch yang berjalan berulang kali.
+   */
+  ensureReview: (repo: string, branch: string, projectId: string | null) => Promise<void>;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
 
-const emptyData: Dataset = { members: [], projects: [], tasks: [], logs: [] };
+const emptyData: Dataset = { members: [], projects: [], tasks: [], logs: [], reviews: [] };
 
 function newId() {
   if (typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
@@ -172,6 +182,7 @@ const TABLE_TO_KEY: Record<string, keyof Dataset> = {
   projects: "projects",
   tasks: "tasks",
   progress_logs: "logs",
+  branch_reviews: "reviews",
 };
 
 export function StoreProvider({ children }: { children: ReactNode }) {
@@ -194,7 +205,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
     async function load() {
       if (isSupabaseConfigured && supabase) {
-        const [mRes, pRes, tRes, lRes] = await Promise.all([
+        const [mRes, pRes, tRes, lRes, rRes] = await Promise.all([
           supabase.from("members").select("*").order("created_at"),
           supabase.from("projects").select("*").order("created_at"),
           supabase.from("tasks").select("*").order("created_at"),
@@ -203,6 +214,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
             .select("*")
             .order("created_at", { ascending: false })
             .limit(LOGS_INITIAL_LIMIT),
+          supabase.from("branch_reviews").select("*").order("created_at"),
         ]);
 
         const firstError = mRes.error || pRes.error || tRes.error || lRes.error;
@@ -217,12 +229,23 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           return;
         }
 
+        // branch_reviews sengaja tidak ikut menggagalkan pemuatan: tabelnya
+        // baru ada setelah migrasi 20260822 dijalankan. Sebelum itu aplikasi
+        // tetap jalan penuh, hanya fitur Project Manager yang kosong.
+        if (rRes.error) {
+          setError(
+            `Fitur tinjauan branch belum aktif: ${rRes.error.message}. ` +
+              `Jalankan migrasi terbaru (npm run db:push) untuk mengaktifkannya.`
+          );
+        }
+
         const logs = (lRes.data ?? []) as ProgressLog[];
         setData({
           members: (mRes.data ?? []) as Member[],
           projects: (pRes.data ?? []) as Project[],
           tasks: (tRes.data ?? []) as Task[],
           logs,
+          reviews: (rRes.data ?? []) as BranchReview[],
         });
         setLogsTruncated(logs.length === LOGS_INITIAL_LIMIT);
         setLoading(false);
@@ -231,7 +254,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
       // Mode demo: pakai localStorage, isi dengan seed kalau masih kosong.
       const stored = readLocal();
-      const next = stored ?? buildSeedData();
+      // Data yang tersimpan sebelum fitur tinjauan branch ada tidak punya
+      // koleksi `reviews`; tanpa penyetaraan ini komponen yang memetakannya
+      // akan menabrak undefined.
+      const next: Dataset = stored
+        ? { ...stored, reviews: stored.reviews ?? [] }
+        : buildSeedData();
       if (!stored) scheduleWriteLocal(next);
       if (cancelled) return;
       setData(next);
@@ -537,6 +565,62 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     [deleteRow]
   );
 
+  // ---------------- Branch reviews ----------------
+  const addReview = useCallback(
+    (r: NewReview) =>
+      insertRow(
+        "branch_reviews",
+        { ...r, id: newId(), created_at: new Date().toISOString() },
+        "reviews"
+      ),
+    [insertRow]
+  );
+
+  const updateReview = useCallback(
+    (id: string, patch: Partial<BranchReview>) => {
+      // Mode demo tidak punya trigger Postgres, jadi decided_at diisi manual
+      // supaya perilakunya sama dengan mode Supabase.
+      const enriched: Partial<BranchReview> =
+        !isSupabaseConfigured && patch.status
+          ? {
+              ...patch,
+              decided_at:
+                patch.status === "pending" ? null : new Date().toISOString(),
+            }
+          : patch;
+      return updateRow("branch_reviews", id, enriched, "reviews");
+    },
+    [updateRow]
+  );
+
+  /**
+   * Idempoten: dipanggil tiap kali daftar branch disinkronkan, jadi harus
+   * aman diulang. Cek dilakukan terhadap state terkini — di Postgres ada
+   * unique(repo, branch) sebagai jaring pengaman kalau dua anggota
+   * menyinkronkan bersamaan.
+   */
+  const ensureReview = useCallback(
+    async (repo: string, branch: string, projectId: string | null) => {
+      const exists = data.reviews.some(
+        (r) => r.repo === repo && r.branch === branch
+      );
+      if (exists) return;
+
+      await addReview({
+        project_id: projectId,
+        repo,
+        branch,
+        status: "pending",
+        reviewer_id: null,
+        note: null,
+        decided_at: null,
+        merged_at: null,
+        merge_sha: null,
+      });
+    },
+    [data.reviews, addReview]
+  );
+
   const currentMember = useMemo(
     () =>
       data.members.find((m) => m.id === currentMemberId) ??
@@ -572,6 +656,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       deleteTask,
       addLog,
       deleteLog,
+      addReview,
+      updateReview,
+      ensureReview,
     }),
     [
       data,
@@ -592,6 +679,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       deleteTask,
       addLog,
       deleteLog,
+      addReview,
+      updateReview,
+      ensureReview,
     ]
   );
 

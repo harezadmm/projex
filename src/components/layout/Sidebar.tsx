@@ -9,6 +9,7 @@ import {
   Users,
   ClipboardList,
   GitCommitHorizontal,
+  GitPullRequestArrow,
   FileText,
   Settings,
 } from "lucide-react";
@@ -18,6 +19,7 @@ export const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutGrid },
   { href: "/projects", label: "Proyek", icon: FolderKanban },
   { href: "/tasks", label: "Tugas", icon: ListChecks },
+  { href: "/manager", label: "Project Manager", icon: GitPullRequestArrow },
   { href: "/members", label: "Anggota", icon: Users },
   { href: "/progress", label: "Catatan Progres", icon: ClipboardList },
   { href: "/activity", label: "Aktivitas GitHub", icon: GitCommitHorizontal },
@@ -49,8 +51,8 @@ export function Sidebar() {
             className={cn(
               "group relative grid size-11 shrink-0 place-items-center rounded-2xl transition",
               active
-                ? "bg-slate-900 text-white shadow-lg shadow-slate-900/20"
-                : "text-slate-400 hover:bg-white/80 hover:text-slate-700"
+                ? "bg-inverse text-on-inverse shadow-lg shadow-black/25"
+                : "text-faint hover:bg-surface/80 hover:text-ink-2"
             )}
           >
             <Icon className="size-5" strokeWidth={active ? 2.2 : 1.9} />
@@ -58,7 +60,7 @@ export function Sidebar() {
             {/* Tooltip nama menu, muncul saat hover di layar lebar */}
             <span
               role="tooltip"
-              className="pointer-events-none absolute left-full z-30 ml-3 hidden whitespace-nowrap rounded-lg bg-slate-900 px-2.5 py-1.5 text-xs font-medium text-white opacity-0 transition-opacity group-hover:opacity-100 lg:block"
+              className="pointer-events-none absolute left-full z-30 ml-3 hidden whitespace-nowrap rounded-lg bg-inverse px-2.5 py-1.5 text-xs font-medium text-on-inverse opacity-0 transition-opacity group-hover:opacity-100 lg:block"
             >
               {label}
             </span>

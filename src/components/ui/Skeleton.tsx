@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-2xl bg-white/60", className)} />;
+  return <div className={cn("animate-pulse rounded-2xl bg-surface/60", className)} />;
 }
 
 /** Placeholder seukuran kartu, dipakai saat data awal masih dimuat. */

@@ -27,9 +27,9 @@ const COLOR_LABEL: Record<AccentColor, string> = {
 };
 
 const STATUS_CHIP: Record<ProjectStatus, string> = {
-  not_started: "bg-slate-100 text-slate-600",
-  in_progress: "bg-blue-100 text-blue-700",
-  completed: "bg-green-100 text-green-700",
+  not_started: "bg-surface-3 text-ink-2",
+  in_progress: "bg-[var(--tone-blue-pastel)] text-[var(--tone-blue-text)]",
+  completed: "bg-[var(--tone-green-pastel)] text-[var(--tone-green-text)]",
 };
 
 interface FormState {
@@ -142,7 +142,7 @@ export default function ProjectsPage() {
         </div>
       ) : projects.length === 0 ? (
         <Card className="py-16 text-center">
-          <p className="text-slate-500">Belum ada proyek. Buat proyek pertamamu.</p>
+          <p className="text-muted">Belum ada proyek. Buat proyek pertamamu.</p>
           <Button onClick={openCreate} className="mx-auto mt-4">
             <Plus className="size-4" /> Proyek Baru
           </Button>
@@ -160,7 +160,7 @@ export default function ProjectsPage() {
                     <span className={cn("size-3 shrink-0 rounded-full", accent.dot)} />
                     <Link
                       href={`/projects/${p.id}`}
-                      className="truncate font-semibold text-slate-900 transition hover:underline"
+                      className="truncate font-semibold text-ink transition hover:underline"
                     >
                       {p.name}
                     </Link>
@@ -171,7 +171,7 @@ export default function ProjectsPage() {
                       type="button"
                       onClick={() => openEdit(p)}
                       aria-label={`Ubah proyek ${p.name}`}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      className="grid size-8 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
                     >
                       <Pencil className="size-4" />
                     </button>
@@ -179,7 +179,7 @@ export default function ProjectsPage() {
                       type="button"
                       onClick={() => handleDelete(p)}
                       aria-label={`Hapus proyek ${p.name}`}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                      className="grid size-8 place-items-center rounded-full text-faint transition hover:bg-[var(--tone-red-soft)] hover:text-[var(--tone-red-text)]"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -187,7 +187,7 @@ export default function ProjectsPage() {
                 </div>
 
                 {p.description && (
-                  <p className="mt-2 line-clamp-2 text-sm text-slate-500">{p.description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm text-muted">{p.description}</p>
                 )}
 
                 <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -195,7 +195,7 @@ export default function ProjectsPage() {
                     {PROJECT_STATUS_LABEL[p.status]}
                   </Badge>
                   {p.deadline && (
-                    <Badge className="bg-slate-100 text-slate-600">
+                    <Badge className="bg-surface-3 text-ink-2">
                       Deadline {relativeDays(p.deadline)}
                     </Badge>
                   )}
@@ -203,13 +203,13 @@ export default function ProjectsPage() {
 
                 <div className="mt-4">
                   <div className="mb-1.5 flex justify-between text-xs">
-                    <span className="text-slate-500">
+                    <span className="text-muted">
                       {s.done}/{s.total} tugas selesai
                     </span>
-                    <span className="font-semibold text-slate-700">{s.pct}%</span>
+                    <span className="font-semibold text-ink-2">{s.pct}%</span>
                   </div>
                   <div
-                    className="h-2.5 overflow-hidden rounded-full bg-slate-100"
+                    className="h-2.5 overflow-hidden rounded-full bg-surface-3"
                     role="progressbar"
                     aria-valuenow={s.pct}
                     aria-valuemin={0}
@@ -223,7 +223,7 @@ export default function ProjectsPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between gap-3 border-t border-slate-100 pt-3 text-xs text-slate-400">
+                <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3 text-xs text-faint">
                   <span>
                     {formatDate(p.start_date)} → {formatDate(p.deadline)}
                   </span>
@@ -235,7 +235,7 @@ export default function ProjectsPage() {
                         rel="noreferrer noopener"
                         aria-label={`Buka repo ${p.name}`}
                         title="Buka repo GitHub"
-                        className="grid size-7 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                        className="grid size-7 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
                       >
                         <GithubIcon className="size-4" />
                       </a>
@@ -243,7 +243,7 @@ export default function ProjectsPage() {
                     <Link
                       href={`/projects/${p.id}`}
                       aria-label={`Buka detail ${p.name}`}
-                      className="grid size-7 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      className="grid size-7 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
                     >
                       <ArrowUpRight className="size-4" />
                     </Link>

@@ -80,17 +80,17 @@ export function ActivityChartCard() {
       <div className="mb-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm">
         <span className="flex items-center gap-2">
           <span className="size-2.5 rounded-full bg-blue-500" />
-          <span className="text-slate-600">
-            Commit: <span className="font-semibold text-slate-900">{totalCommits}</span>
+          <span className="text-ink-2">
+            Commit: <span className="font-semibold text-ink">{totalCommits}</span>
           </span>
         </span>
         <span className="flex items-center gap-2">
           <span className="size-2.5 rounded-full bg-orange-500" />
-          <span className="text-slate-600">
-            Catatan: <span className="font-semibold text-slate-900">{totalLogs}</span>
+          <span className="text-ink-2">
+            Catatan: <span className="font-semibold text-ink">{totalLogs}</span>
           </span>
         </span>
-        <span className="ml-auto text-xs text-slate-400">{DAYS} hari terakhir</span>
+        <span className="ml-auto text-xs text-faint">{DAYS} hari terakhir</span>
       </div>
 
       <div className="h-52 w-full">
@@ -154,11 +154,11 @@ export function ActivityChartCard() {
       </div>
 
       {loading && (
-        <p className="mt-3 text-xs text-slate-400">Memuat commit dari GitHub…</p>
+        <p className="mt-3 text-xs text-faint">Memuat commit dari GitHub…</p>
       )}
 
       {!loading && !repoUrl && (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-muted">
           Belum ada repo terhubung.{" "}
           <Link href="/settings" className="font-medium underline">
             Tambahkan URL repo
@@ -168,7 +168,7 @@ export function ActivityChartCard() {
       )}
 
       {!loading && commitError && (
-        <p className="mt-3 flex items-start gap-1.5 text-xs text-amber-700">
+        <p className="mt-3 flex items-start gap-1.5 text-xs text-[var(--tone-amber-text)]">
           <AlertCircle className="mt-0.5 size-3.5 shrink-0" />
           <span>{commitError}</span>
         </p>

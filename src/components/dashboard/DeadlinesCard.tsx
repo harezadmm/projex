@@ -40,7 +40,7 @@ export function DeadlinesCard() {
       />
 
       {upcoming.length === 0 ? (
-        <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+        <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">
           Tidak ada deadline yang tertunda.
         </p>
       ) : (
@@ -48,27 +48,27 @@ export function DeadlinesCard() {
           {upcoming.map(({ task, member, overdue }) => (
             <li
               key={task.id}
-              className="rounded-2xl border border-slate-200 p-3.5 transition hover:border-slate-300"
+              className="rounded-2xl border border-line p-3.5 transition hover:border-line-2"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p
                     className={cn(
                       "text-xs font-semibold",
-                      overdue ? "text-red-600" : "text-slate-500"
+                      overdue ? "text-[var(--tone-red-text)]" : "text-muted"
                     )}
                   >
                     {overdue ? "Terlambat · " : ""}
                     {relativeDays(task.due_date)}
                   </p>
-                  <p className="mt-0.5 truncate text-sm font-semibold text-slate-900">
+                  <p className="mt-0.5 truncate text-sm font-semibold text-ink">
                     {task.title}
                   </p>
                 </div>
                 <Link
                   href="/tasks"
                   aria-label={`Buka tugas ${task.title}`}
-                  className="grid size-7 shrink-0 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                  className="grid size-7 shrink-0 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
                 >
                   <ArrowUpRight className="size-4" />
                 </Link>
@@ -78,12 +78,12 @@ export function DeadlinesCard() {
                 {member ? (
                   <>
                     <Avatar name={member.name} color={member.avatar_color} size="sm" />
-                    <span className="truncate text-xs text-slate-600">{member.name}</span>
+                    <span className="truncate text-xs text-ink-2">{member.name}</span>
                   </>
                 ) : (
-                  <span className="text-xs text-slate-400">Belum ada penanggung jawab</span>
+                  <span className="text-xs text-faint">Belum ada penanggung jawab</span>
                 )}
-                <span className="ml-auto shrink-0 text-xs text-slate-400">
+                <span className="ml-auto shrink-0 text-xs text-faint">
                   {formatDate(task.due_date)}
                 </span>
               </div>
