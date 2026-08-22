@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
@@ -39,17 +38,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      {/*
-        next/script dengan beforeInteractive menaruh skrip ini di <head> pada
-        HTML awal, jadi ia jalan sebelum hidrasi dan sebelum paint pertama.
-        Memakai <script> biasa di dalam komponen memicu peringatan React,
-        karena tag script di badan komponen tidak dieksekusi saat render client.
-      */}
-      <Script
-        id="projex-theme-init"
-        strategy="beforeInteractive"
-        dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
-      />
+      <head>
+        {/*
+          Skrip tema harus jalan sebelum paint pertama, jadi ditulis inline di
+          <head> — pola yang sama dipakai next-themes.
+
+          Bukan <Script strategy="beforeInteractive">: komponen itu dirender
+          sebagai anak langsung <html>, dan <script> bukan anak yang sah untuk
+          <html>. Akibatnya hidrasi React gagal dan SELURUH tombol aplikasi
+          mati. React memang memperingatkan soal tag script di dalam komponen,
+          tapi peringatan itu hanya berlaku untuk render di client — di sini
+          skripnya sengaja hanya dieksekusi dari HTML awal.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full">
         {/* Tema tidak butuh provider: useTheme membaca DOM lewat
             useSyncExternalStore, jadi bisa dipanggil dari mana saja. */}
