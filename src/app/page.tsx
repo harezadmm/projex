@@ -38,7 +38,7 @@ export default function DashboardPage() {
     <>
       <PageHeader eyebrow="Kelola dan pantau proyek kelompokmu" title="Dashboard" />
 
-      <div className="flex flex-col gap-4">
+      <div className="rise-stagger flex flex-col gap-4">
         {/* Baris ringkasan: keadaan seluruh pekerjaan dalam sekali lihat */}
         <StatTiles />
 

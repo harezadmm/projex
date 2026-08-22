@@ -1,6 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 import { RangeProvider } from "@/lib/range";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
@@ -21,6 +22,8 @@ function ErrorBanner() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <RangeProvider>
       {/*
@@ -36,7 +39,13 @@ export function AppShell({ children }: { children: ReactNode }) {
           <Topbar />
           <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:gap-6 print:mt-0 print:gap-0">
             <Sidebar />
-            <main className="min-w-0 flex-1">
+            {/*
+              key=pathname membuat React melepas dan memasang ulang <main>
+              tiap pindah halaman, sehingga animasi masuknya terputar lagi.
+              Tanpa key, elemennya dipakai ulang dan animasi hanya jalan
+              sekali saat load pertama.
+            */}
+            <main key={pathname} className="rise min-w-0 flex-1">
               <ErrorBanner />
               {children}
             </main>

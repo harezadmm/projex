@@ -151,7 +151,16 @@ export function ProductivityHeatmap() {
         // Di layar sempit 53 kolom akan jadi terlalu kecil, jadi diberi lebar
         // minimum lalu dibiarkan menggulir horizontal.
         <div className="overflow-x-auto pb-1">
-          <div className="min-w-[40rem]">
+          {/*
+            371 petak adalah bagian DOM terberat di dashboard.
+            content-visibility menunda layout dan paint-nya sampai benar-benar
+            terlihat, dan contain-intrinsic-size memberi tinggi perkiraan
+            supaya scrollbar tidak melompat sebelum itu terjadi.
+          */}
+          <div
+            className="min-w-[40rem]"
+            style={{ contentVisibility: "auto", containIntrinsicSize: "auto 260px" }}
+          >
             {/* Label bulan: tiap label merentang sampai bulan berikutnya */}
             <div
               className="mb-1.5 grid"

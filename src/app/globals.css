@@ -80,8 +80,8 @@
   --glass-bg: rgb(255 255 255 / 0.62);
   --glass-bg-strong: rgb(255 255 255 / 0.88);
 
-  --glass-sheen-corner: rgb(255 255 255 / 0.55);
-  --glass-sheen-top: rgb(255 255 255 / 0.3);
+  --glass-sheen-corner: rgb(255 255 255 / 0.25);
+  --glass-sheen-top: rgb(255 255 255 / 0.18);
 
   --glass-border: rgb(255 255 255 / 0.7);
   --glass-border-top: rgb(255 255 255 / 0.9);
@@ -210,21 +210,22 @@
     solid, bukan kaca. Dengan film putih 5% di atas near-black, permukaan
     naik satu tingkat DAN lapisan ambient di belakangnya tetap tembus.
   */
-  --glass-bg: rgb(255 255 255 / 0.055);
-  --glass-bg-strong: rgb(30 34 32 / 0.92);
+  /*
+    Film dasar dinaikkan supaya SELURUH permukaan terbaca sebagai kaca,
+    rata dari ujung ke ujung. Sebelumnya film tipis + kilau kuat: hasilnya
+    hanya sudut kiri-atas yang terang, dan batas falloff-nya terlihat
+    sebagai pita diagonal — terbaca seperti overlay gradien, bukan kaca.
+  */
+  --glass-bg: rgb(255 255 255 / 0.075);
+  --glass-bg-strong: rgb(32 36 34 / 0.93);
 
   /*
-    Kilau terarah. Kaca hanya terbaca kalau cahayanya punya ARAH: sudut
-    kiri-atas paling terang, lalu meredup ke kanan-bawah. Film putih rata
-    tanpa arah hanya menghasilkan persegi datar.
+    Kilau sekarang hanya pemberi arah cahaya yang halus, bukan sumber utama
+    kecerahan. Falloff dibiarkan sampai 100% supaya tidak ada tepi yang
+    kelihatan di mana pun.
   */
-  /*
-    0.09 bukan angka selera: kilau menaikkan kecerahan area kiri-atas kartu,
-    dan pada 0.10 teks --faint di area itu turun ke 4.13:1 (gagal AA).
-    0.09 menahannya di 4.7:1 tanpa melemahkan kesan kacanya.
-  */
-  --glass-sheen-corner: rgb(255 255 255 / 0.09);
-  --glass-sheen-top: rgb(255 255 255 / 0.055);
+  --glass-sheen-corner: rgb(255 255 255 / 0.04);
+  --glass-sheen-top: rgb(255 255 255 / 0.035);
 
   /*
     Rim light: tepi atas menangkap cahaya paling banyak, tepi bawah paling
@@ -379,6 +380,65 @@ body::before {
   outline-offset: 2px;
 }
 
+/* ============================================================
+   GERAK
+
+   Semua animasi di sini hanya menyentuh `opacity` dan `transform` —
+   keduanya bisa di-composite GPU tanpa memicu layout atau paint. Animasi
+   pada properti lain (height, top, box-shadow) memaksa perhitungan ulang
+   tiap frame dan itu sumber lag yang paling sering.
+   ============================================================ */
+:root {
+  /* Ease-out yang cepat di awal lalu melunak — terasa responsif, bukan lambat. */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes projex-rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Dipasang di <main> dengan key=pathname, jadi terputar tiap pindah halaman. */
+@utility rise {
+  animation: projex-rise 380ms var(--ease) both;
+}
+
+/*
+  Anak langsung diberi jeda bertingkat supaya isi halaman "menyusun diri"
+  daripada muncul serentak. Dibatasi enam anak pertama: setelah itu jedanya
+  terasa seperti halaman lambat, bukan halus.
+*/
+@utility rise-stagger {
+  & > * {
+    animation: projex-rise 420ms var(--ease) both;
+  }
+  & > *:nth-child(1) { animation-delay: 0ms; }
+  & > *:nth-child(2) { animation-delay: 45ms; }
+  & > *:nth-child(3) { animation-delay: 90ms; }
+  & > *:nth-child(4) { animation-delay: 135ms; }
+  & > *:nth-child(5) { animation-delay: 180ms; }
+  & > *:nth-child(n + 6) { animation-delay: 210ms; }
+}
+
+/*
+  @utility tidak boleh berada di dalam @media, jadi penonaktifannya ditulis
+  sebagai selektor kelas biasa. Animasi dimatikan total, bukan dipercepat —
+  pengguna yang meminta ini biasanya sensitif terhadap gerak, bukan sekadar
+  tidak sabar.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .rise-stagger > * {
+    animation: none !important;
+  }
+}
+
 /* Kontrol form bawaan (date picker, dropdown) ikut tema */
 :root {
   color-scheme: light;
@@ -408,44 +468,67 @@ body::before {
   Lapisan 2 memakai background-image supaya --glass-bg tetap satu sumber
   warna dan bisa ditimpa tema tanpa menyentuh utility ini.
 */
+/*
+  `card` sengaja TIDAK memakai backdrop-filter.
+
+  Yang ada di belakang kartu hanyalah gradien ambient yang sudah halus —
+  memburamkan gradien halus tidak mengubah apa pun yang terlihat, tapi
+  memaksa GPU melakukan satu pass blur seukuran kartu. Satu dashboard bisa
+  memuat sepuluh kartu, jadi sepuluh pass per frame untuk hasil yang tidak
+  terlihat. Translusensinya sendiri tetap ada, jadi ambient di belakangnya
+  tetap tembus dan kesan kacanya tidak hilang.
+
+  Blur disimpan untuk `glass` dan `glass-strong` saja: di sana konten
+  benar-benar bergerak di belakangnya (topbar sticky, modal), dan
+  jumlahnya cuma beberapa per halaman.
+*/
 @utility card {
   border-radius: 1.5rem;
   background-color: var(--glass-bg);
-  /* Lapisan 1: kilau sudut kiri-atas. Lapisan 2: peredupan ke bawah. */
+  /* Falloff sampai 100%: tanpa titik henti, tidak ada tepi yang terlihat. */
   background-image:
-    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
-    linear-gradient(to bottom, var(--glass-sheen-top), transparent 42%);
+    radial-gradient(150% 130% at 0% 0%, var(--glass-sheen-corner), transparent),
+    linear-gradient(to bottom, var(--glass-sheen-top), transparent 65%);
   border: 1px solid;
   border-color: var(--glass-border-top) var(--glass-border-side)
     var(--glass-border-bottom);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
-  backdrop-filter: blur(28px) saturate(150%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
+  /* Batasi area repaint pada kartu itu sendiri. */
+  contain: paint;
 }
 
+/*
+  Bar layout (topbar, rail sidebar). Tanpa kilau radial: elemen ini sangat
+  lebar atau sangat tinggi, sehingga radial dari sudut menghasilkan baji
+  diagonal besar yang terbaca sebagai pita, bukan pantulan.
+*/
 @utility glass {
   background-color: var(--glass-bg);
-  background-image:
-    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
-    linear-gradient(to bottom, var(--glass-sheen-top), transparent 42%);
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-sheen-top),
+    transparent 80%
+  );
   border: 1px solid;
   border-color: var(--glass-border-top) var(--glass-border-side)
     var(--glass-border-bottom);
-  -webkit-backdrop-filter: blur(28px) saturate(150%);
-  backdrop-filter: blur(28px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  backdrop-filter: blur(16px) saturate(140%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 @utility glass-strong {
   background-color: var(--glass-bg-strong);
-  background-image:
-    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
-    linear-gradient(to bottom, var(--glass-sheen-top), transparent 45%);
+  background-image: linear-gradient(
+    to bottom,
+    var(--glass-sheen-top),
+    transparent 70%
+  );
   border: 1px solid;
   border-color: var(--glass-border-top) var(--glass-border-side)
     var(--glass-border-bottom);
-  -webkit-backdrop-filter: blur(36px) saturate(160%);
-  backdrop-filter: blur(36px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
   box-shadow: var(--glass-highlight), 0 32px 64px -24px rgb(0 0 0 / 0.55);
 }
 
