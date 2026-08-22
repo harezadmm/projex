@@ -78,10 +78,20 @@
 
   /* Token liquid glass — satu sumber supaya semua permukaan konsisten */
   --glass-bg: rgb(255 255 255 / 0.62);
-  --glass-bg-strong: rgb(255 255 255 / 0.86);
+  --glass-bg-strong: rgb(255 255 255 / 0.88);
+
+  --glass-sheen-corner: rgb(255 255 255 / 0.55);
+  --glass-sheen-top: rgb(255 255 255 / 0.3);
+
   --glass-border: rgb(255 255 255 / 0.7);
-  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.8);
-  --glass-shadow: 0 1px 2px rgb(18 22 20 / 0.05), 0 14px 36px -18px rgb(18 22 20 / 0.2);
+  --glass-border-top: rgb(255 255 255 / 0.9);
+  --glass-border-side: rgb(255 255 255 / 0.6);
+  --glass-border-bottom: rgb(18 22 20 / 0.06);
+
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.85);
+  --glass-shadow: 0 2px 4px rgb(18 22 20 / 0.04), 0 20px 44px -20px rgb(18 22 20 / 0.22);
+
+  --vignette: rgb(18 22 20 / 0.05);
 
   --glass-fallback: rgb(255 255 255 / 0.94);
   --glass-opaque: #ffffff;
@@ -178,13 +188,13 @@
 
   --ink: #f1f4f1;
   --ink-2: #c2cbc5;
-  --muted: #a0aaa3;
+  --muted: #a6b0a9;
   /*
-    Batas bawahnya ditentukan surface-3 (#232925), permukaan terang yang
-    dipakai chip: abu yang lebih gelap dari sekitar #8a948d gagal 4.5:1
-    di atasnya.
+    Batas bawahnya ditentukan oleh titik paling terang di kartu, yaitu area
+    kilau sudut (~rgb(45,48,47)) — bukan oleh permukaan datar. Abu yang
+    lebih gelap dari sekitar #929c95 gagal 4.5:1 di sana.
   */
-  --faint: #8a948d;
+  --faint: #929c95;
 
   --accent: #cdf141;
   --accent-hover: #d9fa5d;
@@ -200,11 +210,37 @@
     solid, bukan kaca. Dengan film putih 5% di atas near-black, permukaan
     naik satu tingkat DAN lapisan ambient di belakangnya tetap tembus.
   */
-  --glass-bg: rgb(255 255 255 / 0.065);
-  --glass-bg-strong: rgb(28 32 30 / 0.92);
-  --glass-border: rgb(255 255 255 / 0.12);
-  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.12);
-  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.6), 0 24px 56px -28px rgb(0 0 0 / 0.95);
+  --glass-bg: rgb(255 255 255 / 0.055);
+  --glass-bg-strong: rgb(30 34 32 / 0.92);
+
+  /*
+    Kilau terarah. Kaca hanya terbaca kalau cahayanya punya ARAH: sudut
+    kiri-atas paling terang, lalu meredup ke kanan-bawah. Film putih rata
+    tanpa arah hanya menghasilkan persegi datar.
+  */
+  /*
+    0.09 bukan angka selera: kilau menaikkan kecerahan area kiri-atas kartu,
+    dan pada 0.10 teks --faint di area itu turun ke 4.13:1 (gagal AA).
+    0.09 menahannya di 4.7:1 tanpa melemahkan kesan kacanya.
+  */
+  --glass-sheen-corner: rgb(255 255 255 / 0.09);
+  --glass-sheen-top: rgb(255 255 255 / 0.055);
+
+  /*
+    Rim light: tepi atas menangkap cahaya paling banyak, tepi bawah paling
+    sedikit. Border seragam membuat kartu terlihat seperti kotak bergaris,
+    bukan lempeng kaca.
+  */
+  --glass-border: rgb(255 255 255 / 0.1);
+  --glass-border-top: rgb(255 255 255 / 0.18);
+  --glass-border-side: rgb(255 255 255 / 0.09);
+  --glass-border-bottom: rgb(255 255 255 / 0.045);
+
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --glass-shadow: 0 2px 4px rgb(0 0 0 / 0.5), 0 32px 64px -24px rgb(0 0 0 / 0.9);
+
+  /* Vignette: tepi layar lebih gelap supaya kartu terasa melayang. */
+  --vignette: rgb(0 0 0 / 0.5);
 
   --glass-fallback: rgb(28 32 30 / 0.96);
   --glass-opaque: #1c201e;
@@ -307,6 +343,13 @@ body::before {
   z-index: -10;
   pointer-events: none;
   background:
+    /*
+      Vignette didahulukan supaya berada di lapisan paling atas: tepi layar
+      meredup, tengah tetap terang. Ini yang memberi kartu sesuatu untuk
+      "melayang" di atasnya — tanpa gradasi di latar, backdrop-filter tidak
+      punya apa pun untuk diburamkan dan efek kacanya hilang.
+    */
+    radial-gradient(130% 95% at 50% 0%, transparent 38%, var(--vignette) 100%),
     radial-gradient(640px 480px at 8% -4%, var(--ambient-1), transparent 62%),
     radial-gradient(760px 560px at 96% 4%, var(--ambient-2), transparent 60%),
     radial-gradient(720px 640px at 82% 92%, var(--ambient-3), transparent 62%),
@@ -368,41 +411,61 @@ body::before {
 @utility card {
   border-radius: 1.5rem;
   background-color: var(--glass-bg);
-  background-image: linear-gradient(
-    to bottom,
-    rgb(255 255 255 / 0.06),
-    rgb(255 255 255 / 0) 40%
-  );
-  border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
+  /* Lapisan 1: kilau sudut kiri-atas. Lapisan 2: peredupan ke bawah. */
+  background-image:
+    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
+    linear-gradient(to bottom, var(--glass-sheen-top), transparent 42%);
+  border: 1px solid;
+  border-color: var(--glass-border-top) var(--glass-border-side)
+    var(--glass-border-bottom);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  backdrop-filter: blur(28px) saturate(150%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 @utility glass {
   background-color: var(--glass-bg);
-  background-image: linear-gradient(
-    to bottom,
-    rgb(255 255 255 / 0.06),
-    rgb(255 255 255 / 0) 40%
-  );
-  border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
-  backdrop-filter: blur(24px) saturate(150%);
+  background-image:
+    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
+    linear-gradient(to bottom, var(--glass-sheen-top), transparent 42%);
+  border: 1px solid;
+  border-color: var(--glass-border-top) var(--glass-border-side)
+    var(--glass-border-bottom);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  backdrop-filter: blur(28px) saturate(150%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 @utility glass-strong {
   background-color: var(--glass-bg-strong);
+  background-image:
+    radial-gradient(135% 105% at 0% 0%, var(--glass-sheen-corner), transparent 58%),
+    linear-gradient(to bottom, var(--glass-sheen-top), transparent 45%);
+  border: 1px solid;
+  border-color: var(--glass-border-top) var(--glass-border-side)
+    var(--glass-border-bottom);
+  -webkit-backdrop-filter: blur(36px) saturate(160%);
+  backdrop-filter: blur(36px) saturate(160%);
+  box-shadow: var(--glass-highlight), 0 32px 64px -24px rgb(0 0 0 / 0.55);
+}
+
+/*
+  Kaca bersarang untuk elemen kecil DI DALAM kartu — pil, chip, tombol
+  sekunder. Di referensi, lapisan inilah yang membuat kartu terasa
+  bertingkat, bukan satu bidang rata. Tanpa blur: elemen sekecil ini
+  jumlahnya banyak per halaman, dan backdrop-filter dirender per elemen.
+*/
+@utility glass-chip {
+  background-color: var(--glass-bg);
   background-image: linear-gradient(
     to bottom,
-    rgb(255 255 255 / 0.07),
-    rgb(255 255 255 / 0) 45%
+    var(--glass-sheen-top),
+    transparent 60%
   );
-  border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(32px) saturate(160%);
-  backdrop-filter: blur(32px) saturate(160%);
-  box-shadow: var(--glass-highlight), 0 28px 56px -24px rgb(0 0 0 / 0.5);
+  border: 1px solid;
+  border-color: var(--glass-border-top) var(--glass-border-side)
+    var(--glass-border-bottom);
+  box-shadow: var(--glass-highlight);
 }
 
 /* Browser tanpa backdrop-filter: pekatkan latar supaya tetap terbaca */

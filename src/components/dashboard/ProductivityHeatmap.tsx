@@ -136,7 +136,7 @@ export function ProductivityHeatmap() {
       <CardHeader
         title="Peta Produktivitas"
         action={
-          <span className="rounded-full bg-surface-3 px-3 py-1 text-xs font-medium text-ink-2">
+          <span className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-ink-2">
             {total} aktivitas · {activeDays} hari aktif · 12 bulan
           </span>
         }

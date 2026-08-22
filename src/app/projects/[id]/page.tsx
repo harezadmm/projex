@@ -200,7 +200,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
               <CardHeader
                 title={STATUS_STYLE[status].label}
                 action={
-                  <span className="rounded-full bg-surface-3 px-2.5 py-1 text-xs font-semibold text-ink-2">
+                  <span className="glass-chip rounded-full px-2.5 py-1 text-xs font-semibold text-ink-2">
                     {list.length}
                   </span>
                 }

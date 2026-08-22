@@ -216,7 +216,7 @@ export default function ManagerPage() {
         <button
           type="button"
           onClick={() => setReloadKey((k) => k + 1)}
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-4 py-2.5 text-sm font-medium text-ink-2 transition hover:bg-surface-2"
+          className="inline-flex items-center gap-2 glass-chip rounded-full px-4 py-2.5 text-sm font-medium text-ink-2 transition hover:brightness-125"
         >
           <RefreshCw className={cn("size-4", loadingBranches && "animate-spin")} />
           Muat ulang
@@ -227,7 +227,7 @@ export default function ManagerPage() {
             href={`https://github.com/${repo}/branches`}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-3 px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-line"
+            className="inline-flex items-center gap-2 glass-chip rounded-full px-4 py-2.5 text-sm font-medium text-ink transition hover:brightness-125"
           >
             <GithubIcon className="size-4" /> {repo}
           </a>
@@ -361,7 +361,7 @@ export default function ManagerPage() {
             <CardHeader
               title="Branch Fitur"
               action={
-                <span className="rounded-full bg-surface-3 px-2.5 py-1 text-xs font-semibold text-ink-2">
+                <span className="glass-chip rounded-full px-2.5 py-1 text-xs font-semibold text-ink-2">
                   {branches.length}
                 </span>
               }
@@ -450,7 +450,7 @@ export default function ManagerPage() {
                                 return (
                                   <span
                                     key={a.login ?? a.name}
-                                    className="inline-flex items-center gap-1.5 rounded-full bg-surface-3 py-0.5 pr-2.5 pl-0.5"
+                                    className="glass-chip inline-flex items-center gap-1.5 rounded-full py-0.5 pr-2.5 pl-0.5"
                                   >
                                     {m ? (
                                       <Avatar name={m.name} color={m.avatar_color} size="sm" />
@@ -461,7 +461,10 @@ export default function ManagerPage() {
                                     )}
                                     <span className="text-xs text-ink-2">
                                       {m?.name ?? a.login ?? a.name}
-                                      <span className="text-faint"> · {a.count}</span>
+                                      {/* text-faint gagal AA di sini: chip
+                                          kaca bersarang tiga lapis membuat
+                                          latarnya jauh lebih terang. */}
+                                      <span className="text-muted"> · {a.count}</span>
                                     </span>
                                   </span>
                                 );
