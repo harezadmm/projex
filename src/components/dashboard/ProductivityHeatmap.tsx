@@ -34,12 +34,20 @@ function startOfWeekMonday(d: Date): Date {
   return out;
 }
 
+/**
+ * Ramp diambil dari token --heat-*, bukan alpha dari --accent.
+ *
+ * Alpha tidak bisa dipakai untuk dua tema sekaligus: lime 20% di atas latar
+ * terang hampir tidak terbedakan dari petak kosong, sehingga level terendah
+ * hilang. Token eksplisit membuat ramp bergerak makin gelap di tema terang
+ * dan makin terang di tema gelap.
+ */
 const LEVEL_CLASS = [
-  "bg-surface-3",
-  "bg-blue-500/25",
-  "bg-blue-500/45",
-  "bg-blue-500/70",
-  "bg-blue-500",
+  "bg-[var(--heat-0)]",
+  "bg-[var(--heat-1)]",
+  "bg-[var(--heat-2)]",
+  "bg-[var(--heat-3)]",
+  "bg-[var(--heat-4)]",
 ];
 
 /**

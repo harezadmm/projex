@@ -183,7 +183,7 @@ export default function ActivityPage() {
             href={`https://github.com/${repo}`}
             target="_blank"
             rel="noreferrer noopener"
-            className="inline-flex items-center gap-2 rounded-full bg-inverse px-4 py-2.5 text-sm font-medium text-on-inverse transition hover:bg-inverse-hover"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-3 px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-line"
           >
             <GithubIcon className="size-4" /> {repo}
           </a>

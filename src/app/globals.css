@@ -27,54 +27,86 @@
   --color-inverse: var(--inverse);
   --color-inverse-hover: var(--inverse-hover);
   --color-on-inverse: var(--on-inverse);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
 }
 
 /* ============================================================
    TEMA TERANG (default variabel; tema gelap menimpanya di bawah)
    ============================================================ */
 :root {
-  --panel: #eef2f9;
+  /*
+    Netral sengaja bukan slate biru. Latar bercast biru membuat aksen biru
+    apa pun tenggelam ke dalamnya, dan itulah kenapa tema lama terasa satu
+    warna. Skala ini abu netral dengan sedikit cast hijau supaya aksen lime
+    di bawah punya ruang untuk menonjol.
+  */
+  --panel: #f1f3f1;
 
   --surface: #ffffff;
-  --surface-2: #f8fafc;
-  --surface-3: #f1f5f9;
+  --surface-2: #f7f9f7;
+  --surface-3: #eef1ee;
 
-  --line: #e2e8f0;
-  --line-2: #cbd5e1;
+  --line: #e1e5e2;
+  --line-2: #c8cfca;
 
-  --ink: #0f172a;
-  --ink-2: #334155;
+  --ink: #121614;
+  --ink-2: #3a423d;
   /*
     Tangga abu-abu ini dibatasi kontras, bukan selera: di atas putih, abu
     yang lebih terang dari sekitar #767676 gagal WCAG AA (4.5:1) untuk teks
-    kecil. --faint sebelumnya #94a3b8 (2.4:1) — terlalu pudar untuk dibaca.
+    kecil.
   */
-  --muted: #4d5b71;
-  --faint: #5b6a80;
+  --muted: #4d564f;
+  --faint: #5b645d;
 
-  /* Tombol utama: gelap di tema terang, terang di tema gelap */
-  --inverse: #0f172a;
-  --inverse-hover: #1e293b;
-  --on-inverse: #ffffff;
+  /*
+    Aksen tunggal. Dipakai untuk tombol utama, pil nav aktif, dan bar
+    progres — jadi satu-satunya warna "berteriak" di layar, seperti lime di
+    referensi. Di tema terang sedikit lebih tua supaya tidak menyilaukan.
+  */
+  --accent: #a9d327;
+  --accent-hover: #b8e034;
+  --on-accent: #12180a;
+
+  /* Alias historis: seluruh komponen memakai bg-inverse untuk aksi utama. */
+  --inverse: var(--accent);
+  --inverse-hover: var(--accent-hover);
+  --on-inverse: var(--on-accent);
 
   /* Token liquid glass — satu sumber supaya semua permukaan konsisten */
-  --glass-bg: rgb(255 255 255 / 0.58);
-  --glass-bg-strong: rgb(255 255 255 / 0.8);
-  --glass-border: rgb(255 255 255 / 0.65);
-  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.75);
-  --glass-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 12px 32px -16px rgb(15 23 42 / 0.18);
+  --glass-bg: rgb(255 255 255 / 0.62);
+  --glass-bg-strong: rgb(255 255 255 / 0.86);
+  --glass-border: rgb(255 255 255 / 0.7);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.8);
+  --glass-shadow: 0 1px 2px rgb(18 22 20 / 0.05), 0 14px 36px -18px rgb(18 22 20 / 0.2);
 
   --glass-fallback: rgb(255 255 255 / 0.94);
   --glass-opaque: #ffffff;
 
-  /* Lapisan ambient di belakang kaca */
-  --ambient-1: rgb(255 214 165 / 0.5);
-  --ambient-2: rgb(167 199 255 / 0.55);
-  --ambient-3: rgb(196 181 253 / 0.42);
-  --ambient-4: rgb(165 232 255 / 0.45);
+  /* Lapisan ambient di belakang kaca — tipis, satu keluarga warna */
+  --ambient-1: rgb(169 211 39 / 0.16);
+  --ambient-2: rgb(120 190 150 / 0.14);
+  --ambient-3: rgb(210 220 200 / 0.5);
+  --ambient-4: rgb(190 205 195 / 0.4);
 
-  --scrollbar: #cbd5e1;
-  --focus-ring: rgb(37 99 235 / 0.55);
+  --scrollbar: #c8cfca;
+  --focus-ring: rgb(85 115 15 / 0.75);
+
+  /*
+    Ramp heatmap ditulis eksplisit per tema, bukan alpha dari --accent.
+    Alasannya: lime 20% di atas putih praktis tidak terbedakan dari
+    surface-3, jadi level terendah hilang. Di tema terang ramp bergerak
+    makin GELAP, di tema gelap makin TERANG.
+  */
+  --heat-0: #edf0eb;
+  --heat-1: #b9d75f;
+  --heat-2: #8fbe2c;
+  --heat-3: #648c12;
+  --heat-4: #3f570c;
+  --heat-text: #12180a;
 
   /*
     Palet aksen. Dipakai lewat `bg-[var(--tone-x-soft)]` di lib/ui.ts —
@@ -129,41 +161,69 @@
    TEMA GELAP
    ============================================================ */
 .dark {
-  --panel: #080c15;
+  /*
+    Near-black netral, bukan navy. Cast hijaunya sangat tipis (kanal hijau
+    +2 dari merah) — cukup untuk menyatu dengan aksen lime tanpa terlihat
+    "hijau". Tangga surface dinaikkan jaraknya supaya kartu benar-benar
+    terpisah dari latar, masalah yang paling terasa di tema sebelumnya.
+  */
+  --panel: #0b0e0d;
 
-  --surface: #121a2a;
-  --surface-2: #18202f;
-  --surface-3: #212b3d;
+  --surface: #151917;
+  --surface-2: #1b201d;
+  --surface-3: #232925;
 
-  --line: #29344a;
-  --line-2: #3a4760;
+  --line: #2b322d;
+  --line-2: #3c443e;
 
-  --ink: #f1f5f9;
-  --ink-2: #cbd5e1;
-  --muted: #a3b1c6;
-  /* Dinaikkan dari #6b7c96: di atas surface-2 kontrasnya hanya 3.4:1 */
-  --faint: #8d9db6;
+  --ink: #f1f4f1;
+  --ink-2: #c2cbc5;
+  --muted: #a0aaa3;
+  /*
+    Batas bawahnya ditentukan surface-3 (#232925), permukaan terang yang
+    dipakai chip: abu yang lebih gelap dari sekitar #8a948d gagal 4.5:1
+    di atasnya.
+  */
+  --faint: #8a948d;
 
-  --inverse: #f1f5f9;
-  --inverse-hover: #ffffff;
-  --on-inverse: #0b1220;
+  --accent: #cdf141;
+  --accent-hover: #d9fa5d;
+  --on-accent: #101408;
 
-  --glass-bg: rgb(18 26 42 / 0.62);
-  --glass-bg-strong: rgb(18 26 42 / 0.88);
-  --glass-border: rgb(255 255 255 / 0.09);
-  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.06);
-  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 16px 40px -20px rgb(0 0 0 / 0.8);
+  --inverse: var(--accent);
+  --inverse-hover: var(--accent-hover);
+  --on-inverse: var(--on-accent);
 
-  --glass-fallback: rgb(18 26 42 / 0.96);
-  --glass-opaque: #121a2a;
+  /*
+    Kaca gelap yang benar memakai film PUTIH tipis, bukan warna latar yang
+    dipekatkan. Versi sebelumnya mengisi navy 62% — hasilnya kotak gelap
+    solid, bukan kaca. Dengan film putih 5% di atas near-black, permukaan
+    naik satu tingkat DAN lapisan ambient di belakangnya tetap tembus.
+  */
+  --glass-bg: rgb(255 255 255 / 0.065);
+  --glass-bg-strong: rgb(28 32 30 / 0.92);
+  --glass-border: rgb(255 255 255 / 0.12);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  --glass-shadow: 0 1px 2px rgb(0 0 0 / 0.6), 0 24px 56px -28px rgb(0 0 0 / 0.95);
 
-  --ambient-1: rgb(56 89 168 / 0.3);
-  --ambient-2: rgb(37 99 235 / 0.22);
-  --ambient-3: rgb(124 58 237 / 0.24);
-  --ambient-4: rgb(14 116 144 / 0.24);
+  --glass-fallback: rgb(28 32 30 / 0.96);
+  --glass-opaque: #1c201e;
 
-  --scrollbar: #334155;
-  --focus-ring: rgb(96 165 250 / 0.75);
+  /* Satu keluarga warna saja: lime redup + hijau teduh. Tanpa ungu/cyan. */
+  --ambient-1: rgb(205 241 65 / 0.07);
+  --ambient-2: rgb(110 190 140 / 0.06);
+  --ambient-3: rgb(60 90 75 / 0.12);
+  --ambient-4: rgb(40 55 48 / 0.16);
+
+  --scrollbar: #333b36;
+  --focus-ring: rgb(205 241 65 / 0.7);
+
+  --heat-0: #232925;
+  --heat-1: #38471c;
+  --heat-2: #5c7a1f;
+  --heat-3: #97bd2c;
+  --heat-4: #cdf141;
+  --heat-text: #f1f4f1;
 
   /*
     Di latar gelap, chip pastel terang akan menyilaukan. Diganti warna
@@ -296,29 +356,53 @@ body::before {
   Item yang dirender massal (kartu Kanban, baris catatan, baris commit)
   sengaja memakai latar solid — jangan diberi blur.
 */
+/*
+  Kaca yang terasa "liquid" butuh tiga lapis, bukan sekadar blur:
+  1. film tipis + blur  -> tembus, tapi isinya tetap terbaca
+  2. gradien halus dari atas -> kesan cahaya jatuh dari satu arah
+  3. hairline putih di tepi atas (box-shadow inset) -> pantulan tepi
+
+  Lapisan 2 memakai background-image supaya --glass-bg tetap satu sumber
+  warna dan bisa ditimpa tema tanpa menyentuh utility ini.
+*/
 @utility card {
   border-radius: 1.5rem;
-  background: var(--glass-bg);
+  background-color: var(--glass-bg);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.06),
+    rgb(255 255 255 / 0) 40%
+  );
   border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 @utility glass {
-  background: var(--glass-bg);
+  background-color: var(--glass-bg);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.06),
+    rgb(255 255 255 / 0) 40%
+  );
   border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
   box-shadow: var(--glass-highlight), var(--glass-shadow);
 }
 
 @utility glass-strong {
-  background: var(--glass-bg-strong);
+  background-color: var(--glass-bg-strong);
+  background-image: linear-gradient(
+    to bottom,
+    rgb(255 255 255 / 0.07),
+    rgb(255 255 255 / 0) 45%
+  );
   border: 1px solid var(--glass-border);
-  -webkit-backdrop-filter: blur(28px) saturate(170%);
-  backdrop-filter: blur(28px) saturate(170%);
-  box-shadow: var(--glass-highlight), 0 24px 48px -20px rgb(15 23 42 / 0.28);
+  -webkit-backdrop-filter: blur(32px) saturate(160%);
+  backdrop-filter: blur(32px) saturate(160%);
+  box-shadow: var(--glass-highlight), 0 28px 56px -24px rgb(0 0 0 / 0.5);
 }
 
 /* Browser tanpa backdrop-filter: pekatkan latar supaya tetap terbaca */
@@ -352,15 +436,28 @@ body::before {
   .dark {
     --surface: #ffffff;
     --surface-2: #ffffff;
-    --surface-3: #f1f5f9;
-    --line: #e2e8f0;
-    --line-2: #cbd5e1;
-    --ink: #0f172a;
-    --ink-2: #334155;
-    --muted: #475569;
-    --faint: #64748b;
-    --inverse: #0f172a;
+    --surface-3: #eef1ee;
+    --line: #e1e5e2;
+    --line-2: #c8cfca;
+    --ink: #121614;
+    --ink-2: #3a423d;
+    --muted: #454d47;
+    --faint: #545c56;
+    /*
+      Aksen lime nyaris tidak terlihat setelah dicetak grayscale, padahal
+      dipakai untuk bar progres. Di atas kertas diganti tinta gelap.
+    */
+    --inverse: #121614;
+    --inverse-hover: #121614;
     --on-inverse: #ffffff;
+    --accent: #121614;
+    --on-accent: #ffffff;
+    /* Ramp heatmap jadi tangga abu supaya tetap terbaca setelah dicetak. */
+    --heat-0: #f0f0f0;
+    --heat-1: #cfcfcf;
+    --heat-2: #a3a3a3;
+    --heat-3: #6e6e6e;
+    --heat-4: #363636;
     color-scheme: light;
   }
 

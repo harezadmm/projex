@@ -176,10 +176,12 @@ export default function TasksPage() {
                   )}
                 </div>
               )}
-              <div className="rounded-2xl bg-inverse px-4 py-2.5 text-on-inverse shadow-md shadow-black/25">
-                <p className="text-[11px] font-medium text-faint">Tugas selesai</p>
-                <p className="text-sm font-bold">
-                  {summary.done} <span className="font-medium text-faint">dari {summary.total}</span>
+              {/* Blok pasif, jadi netral — warna aksen disimpan untuk aksi. */}
+              <div className="rounded-2xl border border-line bg-surface-3 px-4 py-2.5">
+                <p className="text-[11px] font-medium text-muted">Tugas selesai</p>
+                <p className="text-sm font-bold text-ink">
+                  {summary.done}{" "}
+                  <span className="font-medium text-muted">dari {summary.total}</span>
                 </p>
               </div>
             </div>

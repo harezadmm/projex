@@ -60,7 +60,10 @@ export function Sidebar() {
             {/* Tooltip nama menu, muncul saat hover di layar lebar */}
             <span
               role="tooltip"
-              className="pointer-events-none absolute left-full z-30 ml-3 hidden whitespace-nowrap rounded-lg bg-inverse px-2.5 py-1.5 text-xs font-medium text-on-inverse opacity-0 transition-opacity group-hover:opacity-100 lg:block"
+              // Tooltip pakai permukaan netral, bukan warna aksen: aksen
+              // dipakai untuk menandai item aktif, dan dua-duanya lime
+              // membuat tooltip terbaca seolah item itu sedang terpilih.
+              className="pointer-events-none absolute left-full z-30 ml-3 hidden whitespace-nowrap rounded-lg border border-line bg-surface-3 px-2.5 py-1.5 text-xs font-medium text-ink opacity-0 shadow-lg shadow-black/40 transition-opacity group-hover:opacity-100 lg:block"
             >
               {label}
             </span>
