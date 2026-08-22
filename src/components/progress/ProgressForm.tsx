@@ -60,13 +60,13 @@ export function ProgressForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex items-center gap-2.5 rounded-2xl bg-slate-50 p-3">
+      <div className="flex items-center gap-2.5 rounded-2xl bg-surface-2 p-3">
         <Avatar name={currentMember.name} color={currentMember.avatar_color} />
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-slate-900">
+          <p className="truncate text-sm font-semibold text-ink">
             {currentMember.name}
           </p>
-          <p className="truncate text-xs text-slate-500">
+          <p className="truncate text-xs text-muted">
             Menulis sebagai {currentMember.role}
           </p>
         </div>
@@ -102,7 +102,7 @@ export function ProgressForm({
           step={5}
           value={percent}
           onChange={(e) => setPercent(Number(e.target.value))}
-          className="w-full accent-slate-900"
+          className="w-full accent-ink"
           aria-label="Persentase progres"
         />
       </Field>
@@ -118,12 +118,12 @@ export function ProgressForm({
       </Field>
 
       {taskId && (
-        <label className="flex items-center gap-2.5 text-sm text-slate-700">
+        <label className="flex items-center gap-2.5 text-sm text-ink-2">
           <input
             type="checkbox"
             checked={markDone}
             onChange={(e) => setMarkDone(e.target.checked)}
-            className="size-4 rounded border-slate-300"
+            className="size-4 rounded border-line-2"
           />
           Sekalian tandai tugas ini selesai
         </label>

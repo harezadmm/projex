@@ -26,7 +26,7 @@ export function Avatar({
         SIZES[size],
         className
       )}
-      style={{ backgroundColor: ACCENT[color].hex }}
+      style={{ backgroundColor: ACCENT[color].avatar }}
       title={name}
     >
       {initials(name)}

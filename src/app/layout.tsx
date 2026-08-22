@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { StoreProvider } from "@/lib/store";
+import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import { AppShell } from "@/components/layout/AppShell";
 
 const geistSans = Geist({
@@ -16,7 +17,10 @@ const geistMono = Geist_Mono({
 
 // Warna chrome browser (address bar di HP) mengikuti latar aplikasi
 export const viewport: Viewport = {
-  themeColor: "#eef2f9",
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#080c15" },
+    { media: "(prefers-color-scheme: light)", color: "#eef2f9" },
+  ],
 };
 
 export const metadata: Metadata = {
@@ -29,9 +33,28 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="id"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      // Server selalu merender kelas `dark`; skrip di <head> mengoreksinya
+      // ke pilihan tersimpan sebelum paint pertama.
+      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        {/*
+          Skrip tema harus jalan sebelum paint pertama, jadi ditulis inline di
+          <head> — pola yang sama dipakai next-themes.
+
+          Bukan <Script strategy="beforeInteractive">: komponen itu dirender
+          sebagai anak langsung <html>, dan <script> bukan anak yang sah untuk
+          <html>. Akibatnya hidrasi React gagal dan SELURUH tombol aplikasi
+          mati. React memang memperingatkan soal tag script di dalam komponen,
+          tapi peringatan itu hanya berlaku untuk render di client — di sini
+          skripnya sengaja hanya dieksekusi dari HTML awal.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="min-h-full">
+        {/* Tema tidak butuh provider: useTheme membaca DOM lewat
+            useSyncExternalStore, jadi bisa dipanggil dari mana saja. */}
         <StoreProvider>
           <AppShell>{children}</AppShell>
         </StoreProvider>

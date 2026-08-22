@@ -154,7 +154,7 @@ export default function MembersPage() {
         </div>
       ) : members.length === 0 ? (
         <Card className="py-16 text-center">
-          <p className="text-slate-500">
+          <p className="text-muted">
             Belum ada anggota. Tambahkan anggota kelompokmu untuk mulai membagi tugas.
           </p>
           <Button onClick={openCreate} className="mx-auto mt-4">
@@ -173,17 +173,17 @@ export default function MembersPage() {
                   <Avatar name={m.name} color={m.avatar_color} size="lg" />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <h2 className="truncate font-semibold text-slate-900">{m.name}</h2>
+                      <h2 className="truncate font-semibold text-ink">{m.name}</h2>
                       {m.is_lead && (
                         <Crown
-                          className="size-4 shrink-0 text-amber-500"
+                          className="size-4 shrink-0 text-[var(--tone-amber-text)]"
                           aria-label="Ketua kelompok"
                         />
                       )}
                     </div>
-                    <p className="truncate text-sm text-slate-500">{m.role}</p>
+                    <p className="truncate text-sm text-muted">{m.role}</p>
                     {m.email && (
-                      <p className="truncate text-xs text-slate-400">{m.email}</p>
+                      <p className="truncate text-xs text-faint">{m.email}</p>
                     )}
                   </div>
 
@@ -192,7 +192,7 @@ export default function MembersPage() {
                       type="button"
                       onClick={() => openEdit(m)}
                       aria-label={`Ubah data ${m.name}`}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                      className="grid size-8 place-items-center rounded-full text-faint transition hover:bg-surface-3 hover:text-ink-2"
                     >
                       <Pencil className="size-4" />
                     </button>
@@ -200,7 +200,7 @@ export default function MembersPage() {
                       type="button"
                       onClick={() => handleDelete(m)}
                       aria-label={`Hapus ${m.name}`}
-                      className="grid size-8 place-items-center rounded-full text-slate-400 transition hover:bg-red-50 hover:text-red-600"
+                      className="grid size-8 place-items-center rounded-full text-faint transition hover:bg-[var(--tone-red-soft)] hover:text-[var(--tone-red-text)]"
                     >
                       <Trash2 className="size-4" />
                     </button>
@@ -212,34 +212,34 @@ export default function MembersPage() {
                     href={`https://github.com/${m.github_username}`}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-200"
+                    className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium text-ink-2 transition hover:bg-line"
                   >
                     <GithubIcon className="size-3.5" />@{m.github_username}
                   </a>
                 )}
 
-                <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-slate-100 pt-4 text-center">
+                <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-line pt-4 text-center">
                   <div>
-                    <dt className="text-xs text-slate-500">Tugas</dt>
-                    <dd className="text-lg font-semibold text-slate-900">{s.total}</dd>
+                    <dt className="text-xs text-muted">Tugas</dt>
+                    <dd className="text-lg font-semibold text-ink">{s.total}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Berjalan</dt>
-                    <dd className="text-lg font-semibold text-blue-600">{s.open}</dd>
+                    <dt className="text-xs text-muted">Berjalan</dt>
+                    <dd className="text-lg font-semibold text-[var(--tone-blue-text)]">{s.open}</dd>
                   </div>
                   <div>
-                    <dt className="text-xs text-slate-500">Catatan</dt>
-                    <dd className="text-lg font-semibold text-slate-900">{s.logs}</dd>
+                    <dt className="text-xs text-muted">Catatan</dt>
+                    <dd className="text-lg font-semibold text-ink">{s.logs}</dd>
                   </div>
                 </dl>
 
                 <div className="mt-4">
                   <div className="mb-1.5 flex justify-between text-xs">
-                    <span className="text-slate-500">Penyelesaian tugas</span>
-                    <span className="font-semibold text-slate-700">{pct}%</span>
+                    <span className="text-muted">Penyelesaian tugas</span>
+                    <span className="font-semibold text-ink-2">{pct}%</span>
                   </div>
                   <div
-                    className="h-2 overflow-hidden rounded-full bg-slate-100"
+                    className="h-2 overflow-hidden rounded-full bg-surface-3"
                     role="progressbar"
                     aria-valuenow={pct}
                     aria-valuemin={0}
@@ -247,11 +247,11 @@ export default function MembersPage() {
                     aria-label={`Penyelesaian tugas ${m.name}`}
                   >
                     <div
-                      className="h-full rounded-full bg-slate-900 transition-[width] duration-500"
+                      className="h-full rounded-full bg-inverse transition-[width] duration-500"
                       style={{ width: `${pct}%` }}
                     />
                   </div>
-                  <p className="mt-2 text-xs text-slate-400">
+                  <p className="mt-2 text-xs text-faint">
                     Total {s.hours.toFixed(1)} jam tercatat
                   </p>
                 </div>
@@ -327,12 +327,12 @@ export default function MembersPage() {
             />
           </Field>
 
-          <label className="flex items-center gap-2.5 text-sm text-slate-700">
+          <label className="flex items-center gap-2.5 text-sm text-ink-2">
             <input
               type="checkbox"
               checked={form.is_lead}
               onChange={(e) => setForm({ ...form, is_lead: e.target.checked })}
-              className="size-4 rounded border-slate-300"
+              className="size-4 rounded border-line-2"
             />
             Jadikan ketua kelompok / project manager
           </label>

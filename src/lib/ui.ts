@@ -7,15 +7,29 @@ import type { AccentColor, Priority, TaskStatus } from "./types";
  */
 export const ACCENT: Record<
   AccentColor,
-  { soft: string; pastel: string; text: string; dot: string; bar: string; hex: string }
+  {
+    soft: string;
+    pastel: string;
+    text: string;
+    dot: string;
+    bar: string;
+    /** Warna solid untuk grafik dan indikator — cerah supaya terbaca di kedua tema. */
+    hex: string;
+    /**
+     * Latar avatar. Sengaja lebih gelap dari `hex`: inisial ditulis putih,
+     * dan di atas warna -500 kontrasnya cuma ~2.3:1 (gagal WCAG AA).
+     * Shade -700 menaikkannya ke >4.5:1 tanpa mengubah identitas warnanya.
+     */
+    avatar: string;
+  }
 > = {
-  blue:   { soft: "bg-blue-50",   pastel: "bg-blue-100",   text: "text-blue-700",   dot: "bg-blue-500",   bar: "bg-blue-500",   hex: "#3b82f6" },
-  orange: { soft: "bg-orange-50", pastel: "bg-orange-100", text: "text-orange-700", dot: "bg-orange-500", bar: "bg-orange-500", hex: "#f97316" },
-  green:  { soft: "bg-green-50",  pastel: "bg-green-100",  text: "text-green-700",  dot: "bg-green-500",  bar: "bg-green-500",  hex: "#22c55e" },
-  pink:   { soft: "bg-pink-50",   pastel: "bg-pink-100",   text: "text-pink-700",   dot: "bg-pink-500",   bar: "bg-pink-500",   hex: "#ec4899" },
-  purple: { soft: "bg-purple-50", pastel: "bg-purple-100", text: "text-purple-700", dot: "bg-purple-500", bar: "bg-purple-500", hex: "#a855f7" },
-  red:    { soft: "bg-red-50",    pastel: "bg-red-100",    text: "text-red-700",    dot: "bg-red-500",    bar: "bg-red-500",    hex: "#ef4444" },
-  yellow: { soft: "bg-yellow-50", pastel: "bg-yellow-100", text: "text-yellow-700", dot: "bg-yellow-500", bar: "bg-yellow-500", hex: "#eab308" },
+  blue:   { soft: "bg-[var(--tone-blue-soft)]",   pastel: "bg-[var(--tone-blue-pastel)]",   text: "text-[var(--tone-blue-text)]",   dot: "bg-blue-500",   bar: "bg-blue-500",   hex: "#3b82f6", avatar: "#1d4ed8" },
+  orange: { soft: "bg-[var(--tone-orange-soft)]", pastel: "bg-[var(--tone-orange-pastel)]", text: "text-[var(--tone-orange-text)]", dot: "bg-orange-500", bar: "bg-orange-500", hex: "#f97316", avatar: "#c2410c" },
+  green:  { soft: "bg-[var(--tone-green-soft)]",  pastel: "bg-[var(--tone-green-pastel)]",  text: "text-[var(--tone-green-text)]",  dot: "bg-green-500",  bar: "bg-green-500",  hex: "#22c55e", avatar: "#15803d" },
+  pink:   { soft: "bg-[var(--tone-pink-soft)]",   pastel: "bg-[var(--tone-pink-pastel)]",   text: "text-[var(--tone-pink-text)]",   dot: "bg-pink-500",   bar: "bg-pink-500",   hex: "#ec4899", avatar: "#be185d" },
+  purple: { soft: "bg-[var(--tone-purple-soft)]", pastel: "bg-[var(--tone-purple-pastel)]", text: "text-[var(--tone-purple-text)]", dot: "bg-purple-500", bar: "bg-purple-500", hex: "#a855f7", avatar: "#7e22ce" },
+  red:    { soft: "bg-[var(--tone-red-soft)]",    pastel: "bg-[var(--tone-red-pastel)]",    text: "text-[var(--tone-red-text)]",    dot: "bg-red-500",    bar: "bg-red-500",    hex: "#ef4444", avatar: "#b91c1c" },
+  yellow: { soft: "bg-[var(--tone-yellow-soft)]", pastel: "bg-[var(--tone-yellow-pastel)]", text: "text-[var(--tone-yellow-text)]", dot: "bg-yellow-500", bar: "bg-yellow-500", hex: "#eab308", avatar: "#a16207" },
 };
 
 export const ACCENT_KEYS = Object.keys(ACCENT) as AccentColor[];
@@ -26,15 +40,15 @@ export function accentForIndex(i: number): AccentColor {
 }
 
 export const STATUS_STYLE: Record<TaskStatus, { label: string; chip: string; dot: string }> = {
-  todo:        { label: "Belum Mulai", chip: "bg-slate-100 text-slate-600",   dot: "bg-slate-400" },
-  in_progress: { label: "Dikerjakan",  chip: "bg-blue-100 text-blue-700",     dot: "bg-blue-500" },
-  done:        { label: "Selesai",     chip: "bg-green-100 text-green-700",   dot: "bg-green-500" },
+  todo:        { label: "Belum Mulai", chip: "bg-surface-3 text-ink-2",   dot: "bg-faint" },
+  in_progress: { label: "Dikerjakan",  chip: "bg-[var(--tone-blue-pastel)] text-[var(--tone-blue-text)]",     dot: "bg-blue-500" },
+  done:        { label: "Selesai",     chip: "bg-[var(--tone-green-pastel)] text-[var(--tone-green-text)]",   dot: "bg-green-500" },
 };
 
 export const PRIORITY_STYLE: Record<Priority, { label: string; chip: string }> = {
-  low:    { label: "Rendah", chip: "bg-slate-100 text-slate-600" },
-  medium: { label: "Sedang", chip: "bg-amber-100 text-amber-700" },
-  high:   { label: "Tinggi", chip: "bg-red-100 text-red-700" },
+  low:    { label: "Rendah", chip: "bg-surface-3 text-ink-2" },
+  medium: { label: "Sedang", chip: "bg-[var(--tone-amber-pastel)] text-[var(--tone-amber-text)]" },
+  high:   { label: "Tinggi", chip: "bg-[var(--tone-red-pastel)] text-[var(--tone-red-text)]" },
 };
 
 /** Inisial nama, maksimal 2 huruf. */

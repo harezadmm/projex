@@ -13,7 +13,7 @@ function ErrorBanner() {
   return (
     <div
       role="alert"
-      className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      className="mb-4 rounded-2xl border border-[var(--tone-red-pastel)] bg-[var(--tone-red-soft)] px-4 py-3 text-sm text-[var(--tone-red-text)]"
     >
       {error}
     </div>
@@ -32,7 +32,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       */}
       <div className="flex min-h-screen print:block">
         {/* Padding hanya di dalam panel supaya konten tidak menempel tepi layar. */}
-        <div className="w-full p-4 sm:p-6 print:bg-white print:p-0">
+        <div className="w-full p-4 sm:p-6 print:bg-surface print:p-0">
           <Topbar />
           <div className="mt-5 flex flex-col gap-4 lg:flex-row lg:gap-6 print:mt-0 print:gap-0">
             <Sidebar />

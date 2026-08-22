@@ -24,7 +24,7 @@ export function CardHeader({
 }) {
   return (
     <header className={cn("mb-4 flex items-center justify-between gap-3", className)}>
-      <h2 className="text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
+      <h2 className="text-lg font-semibold tracking-tight text-ink">{title}</h2>
       {action}
     </header>
   );
@@ -43,7 +43,7 @@ export function CardIconButton({
   href?: string;
 }) {
   const className =
-    "no-print grid size-9 shrink-0 place-items-center rounded-full bg-slate-900/5 text-slate-600 transition hover:bg-slate-900/10 hover:text-slate-900";
+    "no-print grid size-9 shrink-0 place-items-center rounded-full bg-ink/5 text-ink-2 transition hover:bg-ink/10 hover:text-ink";
 
   if (href) {
     return (

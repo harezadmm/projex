@@ -39,7 +39,7 @@ export function ProjectProgressCard() {
       />
 
       {rows.length === 0 ? (
-        <p className="rounded-2xl bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+        <p className="rounded-2xl bg-surface-2 px-4 py-8 text-center text-sm text-muted">
           Belum ada proyek.{" "}
           <Link href="/projects" className="font-medium underline">
             Buat proyek pertama
@@ -53,18 +53,18 @@ export function ProjectProgressCard() {
               <div className="mb-2 flex items-center justify-between gap-4">
                 <Link
                   href={`/projects/${project.id}`}
-                  className="truncate text-sm font-medium text-slate-800 transition hover:text-slate-950 hover:underline"
+                  className="truncate text-sm font-medium text-ink transition hover:text-ink hover:underline"
                 >
                   {project.name}
                 </Link>
-                <span className="shrink-0 text-sm text-slate-500">
+                <span className="shrink-0 text-sm text-muted">
                   {done}/{total} tugas
-                  <span className="ml-3 font-semibold text-slate-900">{pct}%</span>
+                  <span className="ml-3 font-semibold text-ink">{pct}%</span>
                 </span>
               </div>
 
               <div
-                className="h-3 w-full overflow-hidden rounded-full bg-slate-100"
+                className="h-3 w-full overflow-hidden rounded-full bg-surface-3"
                 role="progressbar"
                 aria-valuenow={pct}
                 aria-valuemin={0}

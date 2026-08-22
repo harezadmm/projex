@@ -1,11 +1,11 @@
 import type { ReactNode, InputHTMLAttributes, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { cn } from "@/lib/cn";
 
-// bg-white/75 (bukan solid) supaya menyatu dengan permukaan kaca di belakangnya;
+// bg-surface/75 (bukan solid) supaya menyatu dengan permukaan kaca di belakangnya;
 // saat fokus dipekatkan ke putih penuh agar teks yang diketik paling terbaca.
 const base =
-  "w-full rounded-xl border border-white/70 bg-white/75 px-3.5 py-2.5 text-sm text-slate-900 " +
-  "placeholder:text-slate-400 outline-none transition focus:border-slate-300 focus:bg-white focus:ring-2 focus:ring-slate-900/10";
+  "w-full rounded-xl border border-white/70 bg-surface/75 px-3.5 py-2.5 text-sm text-ink " +
+  "placeholder:text-faint outline-none transition focus:border-line-2 focus:bg-surface focus:ring-2 focus:ring-ink/15";
 
 export function Field({
   label,
@@ -20,9 +20,9 @@ export function Field({
 }) {
   return (
     <label className={cn("block", className)}>
-      <span className="mb-1.5 block text-xs font-medium text-slate-600">{label}</span>
+      <span className="mb-1.5 block text-xs font-medium text-ink-2">{label}</span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-slate-400">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-faint">{hint}</span>}
     </label>
   );
 }

@@ -54,12 +54,12 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
       <>
         <PageHeader eyebrow="Detail proyek" title="Proyek tidak ditemukan" showSearch={false} />
         <Card className="py-16 text-center">
-          <p className="text-slate-500">
+          <p className="text-muted">
             Proyek dengan ID tersebut tidak ada — mungkin sudah dihapus.
           </p>
           <Link
             href="/projects"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-slate-700 underline"
+            className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 underline"
           >
             <ArrowLeft className="size-4" /> Kembali ke daftar proyek
           </Link>
@@ -74,7 +74,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
     <>
       <Link
         href="/projects"
-        className="no-print mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 transition hover:text-slate-900"
+        className="no-print mb-3 inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 transition hover:text-ink"
       >
         <ArrowLeft className="size-4" /> Semua proyek
       </Link>
@@ -93,7 +93,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
                 href={project.repo_url}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-200"
+                className="inline-flex items-center gap-1.5 rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium text-ink-2 transition hover:bg-line"
               >
                 <GithubIcon className="size-3.5" /> Repo GitHub
               </a>
@@ -101,45 +101,45 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
           </div>
 
           {project.description && (
-            <p className="mt-4 text-sm leading-relaxed text-slate-600">
+            <p className="mt-4 text-sm leading-relaxed text-ink-2">
               {project.description}
             </p>
           )}
 
-          <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-slate-100 pt-5 sm:grid-cols-4">
+          <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-line pt-5 sm:grid-cols-4">
             <div>
-              <dt className="text-xs text-slate-500">Mulai</dt>
-              <dd className="text-sm font-medium text-slate-900">
+              <dt className="text-xs text-muted">Mulai</dt>
+              <dd className="text-sm font-medium text-ink">
                 {formatDate(project.start_date)}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-500">Deadline</dt>
-              <dd className="text-sm font-medium text-slate-900">
+              <dt className="text-xs text-muted">Deadline</dt>
+              <dd className="text-sm font-medium text-ink">
                 {formatDate(project.deadline)}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-500">Sisa waktu</dt>
-              <dd className="text-sm font-medium text-slate-900">
+              <dt className="text-xs text-muted">Sisa waktu</dt>
+              <dd className="text-sm font-medium text-ink">
                 {relativeDays(project.deadline)}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-slate-500">Total tugas</dt>
-              <dd className="text-sm font-medium text-slate-900">{projectTasks.length}</dd>
+              <dt className="text-xs text-muted">Total tugas</dt>
+              <dd className="text-sm font-medium text-ink">{projectTasks.length}</dd>
             </div>
           </dl>
 
           <div className="mt-5">
             <div className="mb-1.5 flex justify-between text-sm">
-              <span className="text-slate-500">
+              <span className="text-muted">
                 {done}/{projectTasks.length} tugas selesai
               </span>
-              <span className="font-semibold text-slate-900">{pct}%</span>
+              <span className="font-semibold text-ink">{pct}%</span>
             </div>
             <div
-              className="h-3 overflow-hidden rounded-full bg-slate-100"
+              className="h-3 overflow-hidden rounded-full bg-surface-3"
               role="progressbar"
               aria-valuenow={pct}
               aria-valuemin={0}
@@ -157,7 +157,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
         <Card>
           <CardHeader title="Catatan Terbaru" />
           {projectLogs.length === 0 ? (
-            <p className="rounded-2xl bg-slate-50 px-4 py-6 text-center text-sm text-slate-500">
+            <p className="rounded-2xl bg-surface-2 px-4 py-6 text-center text-sm text-muted">
               Belum ada catatan progres di proyek ini.
             </p>
           ) : (
@@ -169,11 +169,11 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
                     {member ? (
                       <Avatar name={member.name} color={member.avatar_color} size="sm" />
                     ) : (
-                      <span className="size-8 shrink-0 rounded-full bg-slate-200" />
+                      <span className="size-8 shrink-0 rounded-full bg-line" />
                     )}
                     <div className="min-w-0">
-                      <p className="text-sm text-slate-700">{log.note}</p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-sm text-ink-2">{log.note}</p>
+                      <p className="text-xs text-faint">
                         {member?.name ?? "Anonim"} · {relativeDays(log.created_at)} ·{" "}
                         {log.percent}%
                       </p>
@@ -185,7 +185,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
           )}
           <Link
             href="/progress"
-            className="mt-4 inline-block text-sm font-medium text-slate-600 transition hover:text-slate-900"
+            className="mt-4 inline-block text-sm font-medium text-ink-2 transition hover:text-ink"
           >
             Lihat semua catatan →
           </Link>
@@ -200,13 +200,13 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
               <CardHeader
                 title={STATUS_STYLE[status].label}
                 action={
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600">
+                  <span className="rounded-full bg-surface-3 px-2.5 py-1 text-xs font-semibold text-ink-2">
                     {list.length}
                   </span>
                 }
               />
               {list.length === 0 ? (
-                <p className="rounded-xl bg-slate-50 px-3 py-5 text-center text-xs text-slate-400">
+                <p className="rounded-xl bg-surface-2 px-3 py-5 text-center text-xs text-faint">
                   Kosong
                 </p>
               ) : (
@@ -216,15 +216,15 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
                     return (
                       <li
                         key={task.id}
-                        className="rounded-2xl border border-slate-200 p-3"
+                        className="rounded-2xl border border-line p-3"
                       >
-                        <p className="text-sm font-medium text-slate-900">{task.title}</p>
+                        <p className="text-sm font-medium text-ink">{task.title}</p>
                         <div className="mt-2 flex flex-wrap items-center gap-2">
                           <Badge className={PRIORITY_STYLE[task.priority].chip}>
                             {PRIORITY_STYLE[task.priority].label}
                           </Badge>
                           {task.due_date && (
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-faint">
                               {relativeDays(task.due_date)}
                             </span>
                           )}
@@ -232,7 +232,7 @@ export default function ProjectDetailPage({ params }: PageProps<"/projects/[id]"
                         {member && (
                           <div className="mt-2.5 flex items-center gap-2">
                             <Avatar name={member.name} color={member.avatar_color} size="sm" />
-                            <span className="truncate text-xs text-slate-500">
+                            <span className="truncate text-xs text-muted">
                               {member.name}
                             </span>
                           </div>

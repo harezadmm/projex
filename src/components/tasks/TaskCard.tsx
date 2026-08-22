@@ -17,7 +17,7 @@ export const COLUMNS: TaskStatus[] = ["todo", "in_progress", "done"];
 function dueTone(due: string | null, status: TaskStatus) {
   if (!due) return null;
 
-  const neutral = { text: "text-slate-500", dot: "bg-slate-400" };
+  const neutral = { text: "text-muted", dot: "bg-faint" };
   if (status === "done") return neutral;
 
   const target = new Date(due);
@@ -29,9 +29,9 @@ function dueTone(due: string | null, status: TaskStatus) {
     (startOfDay(target) - startOfDay(new Date())) / 86_400_000
   );
 
-  if (diffDays < 0) return { text: "text-red-600", dot: "bg-red-500" };
-  if (diffDays <= 2) return { text: "text-amber-700", dot: "bg-amber-500" };
-  return { text: "text-green-700", dot: "bg-green-500" };
+  if (diffDays < 0) return { text: "text-[var(--tone-red-text)]", dot: "bg-red-500" };
+  if (diffDays <= 2) return { text: "text-[var(--tone-amber-text)]", dot: "bg-amber-500" };
+  return { text: "text-[var(--tone-green-text)]", dot: "bg-green-500" };
 }
 
 /**
@@ -62,8 +62,8 @@ export function TaskCard({
 }) {
   const accent = project ? ACCENT[project.color] : null;
   // Tab dan badan HARUS memakai kelas bg yang sama persis supaya menyatu mulus
-  const soft = accent?.pastel ?? "bg-slate-100";
-  const tabText = accent?.text ?? "text-slate-600";
+  const soft = accent?.pastel ?? "bg-surface-3";
+  const tabText = accent?.text ?? "text-ink-2";
   const idx = COLUMNS.indexOf(task.status);
   const due = dueTone(task.due_date, task.status);
 
@@ -92,7 +92,7 @@ export function TaskCard({
       {/* Badan kartu: sudut kiri-atas siku supaya menyambung dengan tab */}
       <div className={cn("rounded-2xl rounded-tl-none p-4 shadow-sm", soft)}>
         <div className="flex items-start justify-between gap-2">
-          <p className="text-sm leading-snug font-semibold text-slate-900">
+          <p className="text-sm leading-snug font-semibold text-ink">
             {task.title}
           </p>
           <div className="no-print -mt-1 -mr-1 flex shrink-0 gap-0.5">
@@ -100,7 +100,7 @@ export function TaskCard({
               type="button"
               onClick={() => onEdit(task)}
               aria-label={`Ubah ${task.title}`}
-              className="grid size-7 place-items-center rounded-full text-slate-400 transition hover:bg-white/80 hover:text-slate-700"
+              className="grid size-7 place-items-center rounded-full text-faint transition hover:bg-surface/80 hover:text-ink-2"
             >
               <Pencil className="size-3.5" />
             </button>
@@ -108,7 +108,7 @@ export function TaskCard({
               type="button"
               onClick={() => onDelete(task)}
               aria-label={`Hapus ${task.title}`}
-              className="grid size-7 place-items-center rounded-full text-slate-400 transition hover:bg-white/80 hover:text-red-600"
+              className="grid size-7 place-items-center rounded-full text-faint transition hover:bg-surface/80 hover:text-[var(--tone-red-text)]"
             >
               <Trash2 className="size-3.5" />
             </button>
@@ -116,7 +116,7 @@ export function TaskCard({
         </div>
 
         {task.description && (
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-500">
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted">
             {task.description}
           </p>
         )}
@@ -125,7 +125,7 @@ export function TaskCard({
         {due && (
           <span
             className={cn(
-              "mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 text-xs font-medium",
+              "mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-surface/80 px-2.5 py-1 text-xs font-medium",
               due.text
             )}
           >
@@ -142,12 +142,12 @@ export function TaskCard({
                 name={member.name}
                 color={member.avatar_color}
                 size="sm"
-                className="ring-2 ring-white/80"
+                className="ring-2 ring-surface/80"
               />
-              <span className="min-w-0 truncate text-xs text-slate-600">{member.name}</span>
+              <span className="min-w-0 truncate text-xs text-ink-2">{member.name}</span>
             </>
           ) : (
-            <span className="text-xs text-slate-400">Belum ditugaskan</span>
+            <span className="text-xs text-faint">Belum ditugaskan</span>
           )}
 
           {/* Tombol geser kolom, untuk layar sentuh yang tidak mendukung drag */}
@@ -157,7 +157,7 @@ export function TaskCard({
               disabled={idx === 0}
               onClick={() => onMove(task, -1)}
               aria-label={`Pindahkan ${task.title} ke kolom sebelumnya`}
-              className="grid size-7 place-items-center rounded-full bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-900 disabled:opacity-30"
+              className="grid size-7 place-items-center rounded-full bg-surface/70 text-muted transition hover:bg-surface hover:text-ink disabled:opacity-30"
             >
               <ChevronLeft className="size-4" />
             </button>
@@ -166,7 +166,7 @@ export function TaskCard({
               disabled={idx === COLUMNS.length - 1}
               onClick={() => onMove(task, 1)}
               aria-label={`Pindahkan ${task.title} ke kolom berikutnya`}
-              className="grid size-7 place-items-center rounded-full bg-white/70 text-slate-500 transition hover:bg-white hover:text-slate-900 disabled:opacity-30"
+              className="grid size-7 place-items-center rounded-full bg-surface/70 text-muted transition hover:bg-surface hover:text-ink disabled:opacity-30"
             >
               <ChevronRight className="size-4" />
             </button>

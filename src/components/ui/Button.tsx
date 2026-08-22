@@ -4,10 +4,10 @@ import { cn } from "@/lib/cn";
 type Variant = "primary" | "ghost" | "danger" | "outline";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-slate-900 text-white shadow-md shadow-slate-900/20 hover:bg-slate-800",
-  outline: "border border-white/70 bg-white/60 text-slate-700 hover:bg-white/90",
-  ghost: "text-slate-600 hover:bg-white/70 hover:text-slate-900",
-  danger: "bg-red-50/90 text-red-600 hover:bg-red-100",
+  primary: "bg-inverse text-on-inverse shadow-md shadow-black/25 hover:bg-inverse-hover",
+  outline: "border border-line bg-surface/60 text-ink-2 hover:bg-surface/90",
+  ghost: "text-ink-2 hover:bg-surface/70 hover:text-ink",
+  danger: "bg-[var(--tone-red-soft)] text-[var(--tone-red-text)] hover:bg-[var(--tone-red-pastel)]",
 };
 
 export function Button({

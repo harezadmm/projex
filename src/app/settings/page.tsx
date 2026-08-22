@@ -61,20 +61,20 @@ export default function SettingsPage() {
           <div
             className={cn(
               "flex items-start gap-3 rounded-2xl p-4",
-              mode === "supabase" ? "bg-green-50" : "bg-amber-50"
+              mode === "supabase" ? "bg-[var(--tone-green-soft)]" : "bg-[var(--tone-amber-soft)]"
             )}
           >
             <Database
               className={cn(
                 "mt-0.5 size-5 shrink-0",
-                mode === "supabase" ? "text-green-600" : "text-amber-600"
+                mode === "supabase" ? "text-[var(--tone-green-text)]" : "text-[var(--tone-amber-text)]"
               )}
             />
             <div>
               <p
                 className={cn(
                   "text-sm font-semibold",
-                  mode === "supabase" ? "text-green-800" : "text-amber-800"
+                  mode === "supabase" ? "text-[var(--tone-green-text)]" : "text-[var(--tone-amber-text)]"
                 )}
               >
                 {mode === "supabase"
@@ -84,7 +84,7 @@ export default function SettingsPage() {
               <p
                 className={cn(
                   "mt-1 text-sm",
-                  mode === "supabase" ? "text-green-700" : "text-amber-700"
+                  mode === "supabase" ? "text-[var(--tone-green-text)]" : "text-[var(--tone-amber-text)]"
                 )}
               >
                 {mode === "supabase"
@@ -95,11 +95,11 @@ export default function SettingsPage() {
           </div>
 
           {mode === "demo" && (
-            <div className="mt-4 rounded-2xl border border-slate-200 p-4">
-              <p className="text-sm font-medium text-slate-800">
+            <div className="mt-4 rounded-2xl border border-line p-4">
+              <p className="text-sm font-medium text-ink">
                 Cara menghubungkan Supabase
               </p>
-              <ol className="mt-2 flex list-decimal flex-col gap-1.5 pl-5 text-sm text-slate-600">
+              <ol className="mt-2 flex list-decimal flex-col gap-1.5 pl-5 text-sm text-ink-2">
                 <li>
                   Buat project gratis di{" "}
                   <a
@@ -121,11 +121,11 @@ export default function SettingsPage() {
                   Salin <span className="font-medium">Project URL</span> dan{" "}
                   <span className="font-medium">anon public key</span> dari menu Settings →
                   API ke file{" "}
-                  <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs">
+                  <code className="rounded bg-surface-3 px-1 py-0.5 font-mono text-xs">
                     .env.local
                   </code>
                   , lalu jalankan ulang{" "}
-                  <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs">
+                  <code className="rounded bg-surface-3 px-1 py-0.5 font-mono text-xs">
                     npm run dev
                   </code>
                   .
@@ -153,7 +153,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...`}
         {/* ---------- Identitas laporan ---------- */}
         <Card>
           <CardHeader title="Identitas Laporan" />
-          <p className="mb-4 text-sm text-slate-500">
+          <p className="mb-4 text-sm text-muted">
             Data ini muncul sebagai kop di halaman{" "}
             <Link href="/report" className="font-medium underline">
               Laporan
@@ -196,7 +196,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...`}
                 <Save className="size-4" /> Simpan
               </Button>
               {savedFlash && (
-                <span className="flex items-center gap-1.5 text-sm text-green-600">
+                <span className="flex items-center gap-1.5 text-sm text-[var(--tone-green-text)]">
                   <CheckCircle2 className="size-4" /> Tersimpan
                 </span>
               )}
@@ -207,21 +207,32 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...`}
         {/* ---------- Repo GitHub ---------- */}
         <Card className="lg:col-span-2">
           <CardHeader title="Repo GitHub per Proyek" />
-          <p className="mb-4 text-sm text-slate-500">
+          <p className="mb-4 text-sm text-muted">
             Isi URL repo agar commit tiap anggota otomatis muncul di halaman{" "}
             <Link href="/activity" className="font-medium underline">
               Aktivitas GitHub
             </Link>{" "}
             dan ikut masuk ke laporan. Repo publik tidak butuh token. Untuk repo privat,
             tambahkan{" "}
-            <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs">
+            <code className="rounded bg-surface-3 px-1 py-0.5 font-mono text-xs">
               GITHUB_TOKEN
             </code>{" "}
-            di <code className="rounded bg-slate-100 px-1 py-0.5 font-mono text-xs">.env.local</code>.
+            di <code className="rounded bg-surface-3 px-1 py-0.5 font-mono text-xs">.env.local</code>.
+          </p>
+          <p className="mb-4 rounded-2xl bg-[var(--tone-amber-soft)] px-4 py-3 text-sm text-[var(--tone-amber-text)]">
+            Tombol <span className="font-medium">Merge</span> di halaman{" "}
+            <Link href="/manager" className="font-medium underline">
+              Project Manager
+            </Link>{" "}
+            butuh token dengan <span className="font-medium">izin tulis</span> — scope{" "}
+            <code className="font-mono text-xs">repo</code> untuk token klasik, atau{" "}
+            <code className="font-mono text-xs">contents: write</code> untuk fine-grained
+            token. Tanpa itu, approve dan reject tetap jalan, tapi merge-nya dilakukan
+            manual di GitHub.
           </p>
 
           {projects.length === 0 ? (
-            <p className="rounded-2xl bg-slate-50 px-4 py-8 text-center text-sm text-slate-500">
+            <p className="rounded-2xl bg-surface-2 px-4 py-8 text-center text-sm text-muted">
               Belum ada proyek.{" "}
               <Link href="/projects" className="font-medium underline">
                 Buat proyek dulu
@@ -232,11 +243,11 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...`}
             <ul className="flex flex-col gap-3">
               {projects.map((p) => (
                 <li key={p.id} className="flex flex-wrap items-center gap-3">
-                  <span className="min-w-40 flex-1 truncate text-sm font-medium text-slate-800">
+                  <span className="min-w-40 flex-1 truncate text-sm font-medium text-ink">
                     {p.name}
                   </span>
                   <div className="relative flex-[2]">
-                    <GithubIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-slate-400" />
+                    <GithubIcon className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-faint" />
                     <Input
                       defaultValue={p.repo_url ?? ""}
                       onBlur={(e) => {
@@ -254,7 +265,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbG...`}
               ))}
             </ul>
           )}
-          <p className="mt-3 text-xs text-slate-400">
+          <p className="mt-3 text-xs text-faint">
             Perubahan tersimpan otomatis saat kamu klik di luar kolom.
           </p>
         </Card>
