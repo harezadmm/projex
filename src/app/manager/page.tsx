@@ -71,8 +71,16 @@ export default function ManagerPage() {
 
   const activeProject = repoProjects.find((p) => p.id === selectedProjectId) ?? repoProjects[0];
 
-  const { branches, error, warning, loading: loadingBranches, repo, defaultBranch, canMerge } =
-    useBranches(activeProject?.url ?? null, reloadKey);
+  const {
+    branches,
+    error,
+    warning,
+    loading: loadingBranches,
+    repo,
+    defaultBranch,
+    canMerge,
+    tokenStatus,
+  } = useBranches(activeProject?.url ?? null, reloadKey);
 
   // Tugas Kanban dibuat otomatis dari branch yang punya commit baru.
   const sync = useBranchSync(repo, activeProject?.id ?? null, branches, !loadingBranches);
@@ -273,15 +281,34 @@ export default function ManagerPage() {
         </Card>
       )}
 
-      {!canMerge && repo && (
+      {!canMerge && repo && !loadingBranches && (
         <Card className="mb-4 border border-[var(--tone-amber-pastel)] bg-[var(--tone-amber-soft)]">
           <p className="flex items-start gap-2 text-sm text-[var(--tone-amber-text)]">
             <Lock className="mt-0.5 size-4 shrink-0" />
             <span>
-              Tombol merge nonaktif karena <span className="font-mono">GITHUB_TOKEN</span> belum
-              diisi. Approve dan reject tetap bisa dipakai — merge-nya dilakukan manual di GitHub.
-              Untuk mengaktifkan, isi token dengan izin tulis di{" "}
-              <span className="font-mono">.env.local</span> lalu jalankan ulang server.
+              {tokenStatus === "absent" && (
+                <>
+                  Tombol merge nonaktif karena <span className="font-mono">GITHUB_TOKEN</span>{" "}
+                  belum diisi. Isi token dengan izin tulis di{" "}
+                  <span className="font-mono">.env.local</span> lalu jalankan ulang server.
+                </>
+              )}
+              {tokenStatus === "invalid" && (
+                <>
+                  <span className="font-mono">GITHUB_TOKEN</span> ditolak GitHub — tokennya salah
+                  ketik, sudah dicabut, atau kedaluwarsa. Periksa nilainya, lalu jalankan ulang
+                  server.
+                </>
+              )}
+              {tokenStatus === "no_write" && (
+                <>
+                  <span className="font-mono">GITHUB_TOKEN</span> sah, tapi tidak punya izin tulis
+                  ke <span className="font-mono">{repo}</span>. Pada fine-grained token, atur{" "}
+                  <span className="font-medium">Contents: Read and write</span> dan pastikan repo
+                  ini termasuk dalam Repository access.
+                </>
+              )}{" "}
+              Approve dan reject tetap bisa dipakai — merge-nya dilakukan manual di GitHub.
             </span>
           </p>
         </Card>

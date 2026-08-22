@@ -3,6 +3,14 @@
 import { useEffect, useState } from "react";
 import type { BranchSummary } from "./types";
 
+/**
+ * `absent`   — GITHUB_TOKEN belum diisi
+ * `invalid`  — token ada tapi ditolak GitHub (salah / dicabut / kedaluwarsa)
+ * `no_write` — token sah tapi tidak punya izin tulis ke repo ini
+ * `ok`       — GitHub mengonfirmasi izin push
+ */
+export type TokenStatus = "absent" | "invalid" | "no_write" | "ok";
+
 interface BranchesState {
   branches: BranchSummary[];
   loading: boolean;
@@ -10,8 +18,9 @@ interface BranchesState {
   warning: string | null;
   repo: string | null;
   defaultBranch: string | null;
-  /** False kalau GITHUB_TOKEN belum diisi — tombol merge harus dinonaktifkan. */
+  /** True hanya kalau GitHub sendiri mengonfirmasi izin tulis. */
   canMerge: boolean;
+  tokenStatus: TokenStatus;
 }
 
 const IDLE: BranchesState = {
@@ -22,6 +31,7 @@ const IDLE: BranchesState = {
   repo: null,
   defaultBranch: null,
   canMerge: false,
+  tokenStatus: "absent",
 };
 
 /**
@@ -52,6 +62,7 @@ export function useBranches(
           repo?: string;
           default_branch?: string;
           can_merge?: boolean;
+          token_status?: TokenStatus;
           warning?: string | null;
           error?: string;
         };
@@ -68,11 +79,13 @@ export function useBranches(
                 repo: body.repo ?? null,
                 defaultBranch: body.default_branch ?? null,
                 canMerge: Boolean(body.can_merge),
+                tokenStatus: body.token_status ?? "absent",
               }
             : {
                 ...IDLE,
                 error: body.error ?? `Gagal memuat daftar branch (${res.status}).`,
                 repo: body.repo ?? null,
+                tokenStatus: body.token_status ?? "absent",
               },
         });
       })

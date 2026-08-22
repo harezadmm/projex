@@ -63,16 +63,50 @@ export async function GET(request: Request) {
   const warnings: string[] = [];
 
   try {
-    // ---- 1. Metadata repo untuk tahu branch default
+    // ---- 1. Metadata repo untuk tahu branch default DAN memeriksa token.
+    //
+    // Respons ini memuat objek `permissions` kalau permintaannya
+    // terautentikasi, jadi izin tulis bisa dipastikan tanpa permintaan
+    // tambahan dan tanpa benar-benar menulis apa pun.
     const metaRes = await gh(`/repos/${repo}`);
+
+    // Token buruk pada repo publik dibalas 401, bukan diam-diam dianggap
+    // anonim — jadi kasus "token ada tapi tidak sah" bisa dibedakan.
+    if (metaRes.status === 401) {
+      return NextResponse.json(
+        {
+          error:
+            "GITHUB_TOKEN ditolak GitHub (401). Token salah ketik, sudah dicabut, " +
+            "atau kedaluwarsa. Periksa nilainya di .env.local / Vercel.",
+          repo,
+          token_status: "invalid",
+        },
+        { status: 401 }
+      );
+    }
+
     if (!metaRes.ok) {
       return NextResponse.json(
         { error: explainGithubError(metaRes, repo), repo },
         { status: metaRes.status }
       );
     }
-    const defaultBranch =
-      ((await metaRes.json()) as { default_branch?: string }).default_branch ?? "main";
+
+    const meta = (await metaRes.json()) as {
+      default_branch?: string;
+      permissions?: { admin?: boolean; push?: boolean; pull?: boolean };
+    };
+    const defaultBranch = meta.default_branch ?? "main";
+
+    // `permissions` hanya muncul untuk permintaan terautentikasi. Kalau tidak
+    // ada padahal token terpasang, berarti tokennya tidak dikenali sebagai
+    // milik siapa pun yang punya akses ke repo ini.
+    const canPush = Boolean(meta.permissions?.push);
+    const tokenStatus: "absent" | "no_write" | "ok" = !hasGithubToken()
+      ? "absent"
+      : canPush
+        ? "ok"
+        : "no_write";
 
     // ---- 2. Daftar branch
     const listRes = await gh(`/repos/${repo}/branches?per_page=100`);
@@ -172,7 +206,10 @@ export async function GET(request: Request) {
     return NextResponse.json({
       repo,
       default_branch: defaultBranch,
-      can_merge: hasGithubToken(),
+      // Merge hanya ditawarkan kalau GitHub sendiri mengonfirmasi izin tulis,
+      // bukan sekadar karena env var-nya terisi.
+      can_merge: tokenStatus === "ok",
+      token_status: tokenStatus,
       branches: summaries,
       warning: warnings.length > 0 ? warnings.join(" ") : null,
     });
