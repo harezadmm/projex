@@ -8,7 +8,6 @@ import { cn } from "@/lib/cn";
 
 /** Berapa minggu ditampilkan — setahun penuh plus minggu berjalan. */
 const WEEKS = 53;
-const MONTHS = 12;
 
 const WEEKDAY_LABEL = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
 const MONTH_LABEL = [
@@ -59,19 +58,32 @@ const LEVEL_CLASS = [
   "bg-[var(--heat-4)]",
 ];
 
-interface Bucket {
+interface Cell {
   key: string;
-  label: string;
+  /** Aktivitas pada hari itu sendiri. */
   count: number;
+  /** Total minggu tempat hari ini berada. */
+  weekCount: number;
+  /** Total bulan tempat hari ini berada. */
+  monthCount: number;
+  future: boolean;
+  dayLabel: string;
+  weekLabel: string;
+  monthLabel: string;
 }
 
 /**
- * Peta produktivitas dengan tiga tingkat perbesaran.
+ * Peta produktivitas setahun: kolom = minggu, baris = hari.
  *
- * Harian memakai grid ala GitHub — satu petak per hari, kolom = minggu.
- * Mingguan dan bulanan memakai bar, bukan grid: setelah data diringkas,
- * yang berguna adalah membandingkan besarannya, dan grid satu baris justru
- * membuang informasi itu.
+ * Ketiga tampilan memakai grid yang SAMA — 53 x 7 petak, tidak berubah
+ * bentuk. Yang berganti hanyalah dasar pewarnaannya:
+ *
+ *   Harian   : setiap petak diwarnai oleh aktivitas hari itu sendiri
+ *   Mingguan : tujuh petak dalam satu kolom berbagi warna dari total minggu
+ *   Bulanan  : semua petak dalam satu bulan berbagi warna dari total bulan
+ *
+ * Efeknya seperti memperbesar-mengecilkan resolusi: makin ringkas, makin
+ * terlihat blok periode yang produktif, tanpa kehilangan kerangka kalender.
  *
  * Menggabungkan commit GitHub dengan catatan progres, karena tidak semua
  * pekerjaan kelompok berakhir jadi commit (riset, laporan, desain).
@@ -83,122 +95,137 @@ export function ProductivityHeatmap() {
 
   const [view, setView] = useState<View>("daily");
 
-  const { cells, monthMarks, weekBuckets, monthBuckets, total, best, activeDays } =
-    useMemo(() => {
-      const counts = new Map<string, number>();
-      const bump = (iso: string | null | undefined) => {
-        if (!iso) return;
-        const d = new Date(iso);
-        if (Number.isNaN(d.getTime())) return;
-        const k = dayKey(d);
-        counts.set(k, (counts.get(k) ?? 0) + 1);
-      };
+  const data = useMemo(() => {
+    const counts = new Map<string, number>();
+    const bump = (iso: string | null | undefined) => {
+      if (!iso) return;
+      const d = new Date(iso);
+      if (Number.isNaN(d.getTime())) return;
+      const k = dayKey(d);
+      counts.set(k, (counts.get(k) ?? 0) + 1);
+    };
 
-      for (const c of commits) bump(c.date);
-      for (const l of logs) bump(l.created_at);
+    for (const c of commits) bump(c.date);
+    for (const l of logs) bump(l.created_at);
 
-      // Grid dibangun mundur dari minggu berjalan supaya kolom terakhir
-      // selalu berisi hari ini.
-      const thisWeek = startOfWeekMonday(new Date());
-      const first = new Date(thisWeek);
-      first.setDate(first.getDate() - (WEEKS - 1) * 7);
+    // Grid dibangun mundur dari minggu berjalan supaya kolom terakhir
+    // selalu berisi hari ini.
+    const thisWeek = startOfWeekMonday(new Date());
+    const first = new Date(thisWeek);
+    first.setDate(first.getDate() - (WEEKS - 1) * 7);
 
-      const today = dayKey(new Date());
-      // Urutan kolom-major: satu minggu penuh dulu, baru minggu berikutnya —
-      // cocok dengan grid-flow-col + grid-rows-7.
-      const flat: Array<{ key: string; count: number; future: boolean; label: string }> = [];
-      const marks: Array<{ index: number; label: string }> = [];
-      const weeks: Bucket[] = [];
-      let seenMonth = -1;
-      let sum = 0;
-      let max = 0;
-      let days = 0;
+    const today = dayKey(new Date());
 
-      for (let w = 0; w < WEEKS; w++) {
-        let weekSum = 0;
-        const weekStart = new Date(first);
-        weekStart.setDate(first.getDate() + w * 7);
+    /*
+      Dua lintasan. Lintasan pertama menjumlahkan per minggu dan per bulan;
+      lintasan kedua baru menempelkan total itu ke tiap petak. Sekali jalan
+      tidak bisa: warna sebuah petak bergantung pada total periodenya, yang
+      belum diketahui sampai seluruh periode itu terbaca.
+    */
+    const weekTotals = new Array<number>(WEEKS).fill(0);
+    const monthTotals = new Map<string, number>();
+    const dates: Date[][] = [];
 
-        for (let d = 0; d < 7; d++) {
-          const date = new Date(first);
-          date.setDate(first.getDate() + w * 7 + d);
-          const key = dayKey(date);
-          const count = counts.get(key) ?? 0;
-          sum += count;
-          weekSum += count;
-          if (count > 0) days++;
-          if (count > max) max = count;
+    for (let w = 0; w < WEEKS; w++) {
+      const col: Date[] = [];
+      for (let d = 0; d < 7; d++) {
+        const date = new Date(first);
+        date.setDate(first.getDate() + w * 7 + d);
+        col.push(date);
 
-          flat.push({
-            key,
-            count,
-            future: key > today,
-            label: `${date.getDate()} ${MONTH_LABEL[date.getMonth()]} ${date.getFullYear()}`,
-          });
-        }
-
-        const weekEnd = new Date(weekStart);
-        weekEnd.setDate(weekStart.getDate() + 6);
-        weeks.push({
-          key: dayKey(weekStart),
-          label:
-            `${weekStart.getDate()} ${MONTH_LABEL[weekStart.getMonth()]}` +
-            ` – ${weekEnd.getDate()} ${MONTH_LABEL[weekEnd.getMonth()]}`,
-          count: weekSum,
-        });
-
-        // Label bulan ditaruh di kolom pertama yang menyentuh bulan baru
-        if (weekStart.getMonth() !== seenMonth) {
-          seenMonth = weekStart.getMonth();
-          marks.push({ index: w, label: MONTH_LABEL[seenMonth] });
-        }
+        const n = counts.get(dayKey(date)) ?? 0;
+        weekTotals[w] += n;
+        const mk = `${date.getFullYear()}-${date.getMonth()}`;
+        monthTotals.set(mk, (monthTotals.get(mk) ?? 0) + n);
       }
+      dates.push(col);
+    }
 
-      // Bulanan dihitung dari kunci harian, bukan dari minggu: satu minggu
-      // bisa memotong dua bulan, jadi menjumlahkan minggu akan salah tempat.
-      const months: Bucket[] = [];
-      const now = new Date();
-      for (let i = MONTHS - 1; i >= 0; i--) {
-        const m = new Date(now.getFullYear(), now.getMonth() - i, 1);
-        const prefix = `${m.getFullYear()}-${String(m.getMonth() + 1).padStart(2, "0")}-`;
-        let msum = 0;
-        for (const [k, v] of counts) if (k.startsWith(prefix)) msum += v;
-        months.push({
-          key: prefix,
-          label: `${MONTH_LABEL[m.getMonth()]} ${m.getFullYear()}`,
-          count: msum,
+    const cells: Cell[] = [];
+    const marks: Array<{ index: number; label: string }> = [];
+    let seenMonth = -1;
+    let total = 0;
+    let dayPeak = 0;
+    let activeDays = 0;
+
+    for (let w = 0; w < WEEKS; w++) {
+      for (const date of dates[w]) {
+        const key = dayKey(date);
+        const count = counts.get(key) ?? 0;
+        const mk = `${date.getFullYear()}-${date.getMonth()}`;
+
+        total += count;
+        if (count > 0) activeDays++;
+        if (count > dayPeak) dayPeak = count;
+
+        const wStart = dates[w][0];
+        const wEnd = dates[w][6];
+
+        cells.push({
+          key,
+          count,
+          weekCount: weekTotals[w],
+          monthCount: monthTotals.get(mk) ?? 0,
+          future: key > today,
+          dayLabel: `${date.getDate()} ${MONTH_LABEL[date.getMonth()]} ${date.getFullYear()}`,
+          weekLabel:
+            `Minggu ${wStart.getDate()} ${MONTH_LABEL[wStart.getMonth()]}` +
+            ` – ${wEnd.getDate()} ${MONTH_LABEL[wEnd.getMonth()]}`,
+          monthLabel: `${MONTH_LABEL[date.getMonth()]} ${date.getFullYear()}`,
         });
       }
 
-      return {
-        cells: flat,
-        monthMarks: marks,
-        weekBuckets: weeks,
-        monthBuckets: months,
-        total: sum,
-        best: max,
-        activeDays: days,
-      };
-    }, [commits, logs]);
+      const wStart = dates[w][0];
+      if (wStart.getMonth() !== seenMonth) {
+        seenMonth = wStart.getMonth();
+        marks.push({ index: w, label: MONTH_LABEL[seenMonth] });
+      }
+    }
 
-  /** 0–4; skala relatif terhadap nilai tertinggi supaya tetap terbaca di repo sepi. */
+    return {
+      cells,
+      monthMarks: marks,
+      total,
+      dayPeak,
+      activeDays,
+      weekPeak: Math.max(0, ...weekTotals),
+      monthPeak: Math.max(0, ...monthTotals.values()),
+      activeWeeks: weekTotals.filter((n) => n > 0).length,
+      activeMonths: [...monthTotals.values()].filter((n) => n > 0).length,
+    };
+  }, [commits, logs]);
+
+  /** 0–4; skala relatif terhadap puncak periode agar tetap terbaca di repo sepi. */
   const level = (count: number, peak: number): number => {
     if (count === 0) return 0;
     if (peak <= 1) return 4;
     return Math.min(4, Math.ceil((count / peak) * 4));
   };
 
+  /** Nilai dan label satu petak, sesuai tingkat perbesaran yang dipilih. */
+  const cellView = (c: Cell): { value: number; peak: number; label: string } => {
+    if (view === "weekly")
+      return { value: c.weekCount, peak: data.weekPeak, label: c.weekLabel };
+    if (view === "monthly")
+      return { value: c.monthCount, peak: data.monthPeak, label: c.monthLabel };
+    return { value: c.count, peak: data.dayPeak, label: c.dayLabel };
+  };
+
   const columns = `repeat(${WEEKS}, minmax(0, 1fr))`;
-  const buckets = view === "weekly" ? weekBuckets : monthBuckets;
-  const bucketPeak = Math.max(1, ...buckets.map((b) => b.count));
-  const aktifBucket = buckets.filter((b) => b.count > 0).length;
 
   const ringkasan =
     view === "daily"
-      ? `${total} aktivitas · ${activeDays} hari aktif · 12 bulan`
+      ? `${data.total} aktivitas · ${data.activeDays} hari aktif`
       : view === "weekly"
-        ? `${total} aktivitas · ${aktifBucket} minggu aktif · 53 minggu`
-        : `${total} aktivitas · ${aktifBucket} bulan aktif · 12 bulan`;
+        ? `${data.total} aktivitas · ${data.activeWeeks} minggu aktif`
+        : `${data.total} aktivitas · ${data.activeMonths} bulan aktif`;
+
+  const skalaKeterangan =
+    view === "daily"
+      ? `Warna mengikuti aktivitas per hari · tertinggi ${data.dayPeak}`
+      : view === "weekly"
+        ? `Warna mengikuti total per minggu · tertinggi ${data.weekPeak}`
+        : `Warna mengikuti total per bulan · tertinggi ${data.monthPeak}`;
 
   return (
     <Card>
@@ -206,7 +233,6 @@ export function ProductivityHeatmap() {
         title="Peta Produktivitas"
         action={
           <div className="flex flex-wrap items-center gap-2">
-            {/* Pengalih tampilan; gaya pil mengikuti filter rentang di Topbar */}
             <div
               className="glass-chip flex items-center gap-0.5 rounded-full p-0.5"
               role="group"
@@ -231,7 +257,7 @@ export function ProductivityHeatmap() {
             </div>
 
             <span className="glass-chip hidden rounded-full px-3 py-1 text-xs font-medium text-ink-2 sm:inline">
-              {ringkasan}
+              {ringkasan} · 12 bulan
             </span>
           </div>
         }
@@ -242,7 +268,7 @@ export function ProductivityHeatmap() {
 
       {loading ? (
         <div className="h-40 animate-pulse rounded-2xl bg-surface-3" />
-      ) : view === "daily" ? (
+      ) : (
         // Di layar sempit 53 kolom akan jadi terlalu kecil, jadi diberi lebar
         // minimum lalu dibiarkan menggulir horizontal.
         <div className="overflow-x-auto pb-1">
@@ -265,13 +291,13 @@ export function ProductivityHeatmap() {
                 paddingLeft: `calc(${LABEL_COL} + 0.5rem)`,
               }}
             >
-              {monthMarks.map((m, i) => (
+              {data.monthMarks.map((m, i) => (
                 <span
                   key={`${m.label}-${m.index}`}
                   className="truncate text-[11px] leading-none text-faint"
                   style={{
                     gridColumn: `${m.index + 1} / span ${
-                      (monthMarks[i + 1]?.index ?? WEEKS) - m.index
+                      (data.monthMarks[i + 1]?.index ?? WEEKS) - m.index
                     }`,
                   }}
                 >
@@ -299,91 +325,38 @@ export function ProductivityHeatmap() {
                 className="grid min-w-0 flex-1 grid-flow-col grid-rows-7"
                 style={{ gridTemplateColumns: columns, gap: COL_GAP }}
               >
-                {cells.map((cell) => (
-                  <span
-                    key={cell.key}
-                    title={
-                      cell.future ? cell.label : `${cell.label}: ${cell.count} aktivitas`
-                    }
-                    className={cn(
-                      "aspect-square rounded-[3px]",
-                      cell.future
-                        ? "bg-transparent"
-                        : LEVEL_CLASS[level(cell.count, best)]
-                    )}
-                  />
-                ))}
+                {data.cells.map((cell) => {
+                  const { value, peak, label } = cellView(cell);
+                  return (
+                    <span
+                      key={cell.key}
+                      title={
+                        cell.future
+                          ? cell.dayLabel
+                          : `${label}: ${value} aktivitas`
+                      }
+                      className={cn(
+                        "aspect-square rounded-[3px] transition-colors duration-300",
+                        cell.future
+                          ? "bg-transparent"
+                          : LEVEL_CLASS[level(value, peak)]
+                      )}
+                    />
+                  );
+                })}
               </div>
             </div>
 
-            <div className="mt-3 flex items-center justify-end gap-1.5 text-[11px] text-faint">
-              <span>Sedikit</span>
-              {LEVEL_CLASS.map((c) => (
-                <span key={c} className={cn("size-3 rounded-[3px]", c)} />
-              ))}
-              <span>Banyak</span>
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-faint">
+              <span>{skalaKeterangan}</span>
+              <span className="flex items-center gap-1.5">
+                <span>Sedikit</span>
+                {LEVEL_CLASS.map((c) => (
+                  <span key={c} className={cn("size-3 rounded-[3px]", c)} />
+                ))}
+                <span>Banyak</span>
+              </span>
             </div>
-          </div>
-        </div>
-      ) : (
-        /*
-          Tampilan ringkas: bar, bukan grid. Tinggi bar sebanding dengan
-          jumlah aktivitas, jadi perbandingan antar periode langsung terbaca —
-          sesuatu yang hilang kalau diringkas jadi satu baris petak.
-        */
-        <div className="overflow-x-auto pb-1">
-          <div className={view === "weekly" ? "min-w-[36rem]" : "min-w-0"}>
-            <div className="flex h-40 items-end gap-[3px]" style={{ gap: COL_GAP }}>
-              {buckets.map((b) => (
-                <div
-                  key={b.key}
-                  className="flex h-full flex-1 items-end"
-                  title={`${b.label}: ${b.count} aktivitas`}
-                >
-                  <span
-                    className={cn(
-                      "w-full rounded-[3px] transition-[height] duration-500",
-                      LEVEL_CLASS[level(b.count, bucketPeak)]
-                    )}
-                    style={{
-                      // Periode kosong tetap diberi garis dasar tipis supaya
-                      // terlihat sebagai "nol", bukan sebagai data yang hilang.
-                      height: b.count === 0 ? "3px" : `${Math.max(8, (b.count / bucketPeak) * 100)}%`,
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-1.5 flex" style={{ gap: COL_GAP }}>
-              {view === "weekly"
-                ? // 53 minggu terlalu rapat untuk dilabeli semua, jadi
-                  // labelnya mengikuti batas bulan seperti tampilan harian.
-                  buckets.map((_, i) => {
-                    const mark = monthMarks.find((m) => m.index === i);
-                    return (
-                      <span
-                        key={i}
-                        className="min-w-0 flex-1 truncate text-[11px] leading-none text-faint"
-                      >
-                        {mark?.label ?? ""}
-                      </span>
-                    );
-                  })
-                : buckets.map((b) => (
-                    <span
-                      key={b.key}
-                      className="min-w-0 flex-1 truncate text-center text-[11px] leading-none text-faint"
-                    >
-                      {b.label.split(" ")[0]}
-                    </span>
-                  ))}
-            </div>
-
-            <p className="mt-3 text-right text-[11px] text-faint">
-              Tertinggi {bucketPeak} aktivitas per{" "}
-              {view === "weekly" ? "minggu" : "bulan"}
-            </p>
           </div>
         </div>
       )}
