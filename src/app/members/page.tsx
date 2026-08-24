@@ -1,9 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Pencil, Plus, Trash2, Crown } from "lucide-react";
+import { AlertCircle, Pencil, Plus, Trash2, Crown, Users } from "lucide-react";
 import { GithubIcon } from "@/components/ui/GithubIcon";
 import { useStore } from "@/lib/store";
+import { useContributors } from "@/lib/useRepoData";
+import { useContributorSync } from "@/lib/useContributorSync";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
@@ -54,8 +56,37 @@ const EMPTY_FORM: FormState = {
 };
 
 export default function MembersPage() {
-  const { members, tasks, logs, addMember, updateMember, deleteMember, loading } =
-    useStore();
+  const {
+    members,
+    tasks,
+    logs,
+    projects,
+    addMember,
+    updateMember,
+    deleteMember,
+    loading,
+  } = useStore();
+
+  // Repo pertama yang terhubung dipakai sebagai sumber kontributor.
+  const repoUrl = projects.find((p) => p.repo_url)?.repo_url ?? null;
+  const { contributors, loading: loadingContributors, error: contributorError } =
+    useContributors(repoUrl);
+
+  // Tautkan anggota lama ke kontributor, lalu buat yang belum ada.
+  const sync = useContributorSync(contributors, !loadingContributors);
+
+  /** Jumlah commit nyata per anggota, dicocokkan lewat username GitHub. */
+  const commitsByMember = useMemo(() => {
+    const byLogin = new Map(contributors.map((c) => [c.login.toLowerCase(), c]));
+    const map = new Map<string, number>();
+    for (const m of members) {
+      const c = m.github_username
+        ? byLogin.get(m.github_username.toLowerCase())
+        : undefined;
+      if (c) map.set(m.id, c.commits);
+    }
+    return map;
+  }, [contributors, members]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Member | null>(null);
@@ -146,6 +177,57 @@ export default function MembersPage() {
         }
       />
 
+      {(sync.linked > 0 || sync.created > 0) && (
+        <Card className="mb-4 border border-[var(--tone-green-pastel)] bg-[var(--tone-green-soft)]">
+          <p className="flex items-start gap-2 text-sm text-[var(--tone-green-text)]">
+            <Users className="mt-0.5 size-4 shrink-0" />
+            <span>
+              Diselaraskan dengan kontributor repo:{" "}
+              {sync.linked > 0 && (
+                <>
+                  <span className="font-semibold">{sync.linked}</span> anggota
+                  ditautkan ke akun GitHub-nya
+                </>
+              )}
+              {sync.linked > 0 && sync.created > 0 && ", "}
+              {sync.created > 0 && (
+                <>
+                  <span className="font-semibold">{sync.created}</span> kontributor
+                  ditambahkan sebagai anggota baru
+                </>
+              )}
+              .
+            </span>
+          </p>
+        </Card>
+      )}
+
+      {sync.ambiguous.length > 0 && (
+        <Card className="mb-4 border border-[var(--tone-amber-pastel)] bg-[var(--tone-amber-soft)]">
+          <p className="flex items-start gap-2 text-sm text-[var(--tone-amber-text)]">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>
+              {sync.ambiguous.length} kontributor cocok dengan lebih dari satu
+              anggota, jadi tidak ditautkan otomatis:{" "}
+              <span className="font-mono">
+                {sync.ambiguous.map((c) => c.login).join(", ")}
+              </span>
+              . Isi username GitHub-nya manual lewat tombol ubah supaya
+              commit-nya terhitung.
+            </span>
+          </p>
+        </Card>
+      )}
+
+      {contributorError && (
+        <Card className="mb-4 border border-[var(--tone-amber-pastel)] bg-[var(--tone-amber-soft)]">
+          <p className="flex items-start gap-2 text-sm text-[var(--tone-amber-text)]">
+            <AlertCircle className="mt-0.5 size-4 shrink-0" />
+            <span>Gagal membaca kontributor repo: {contributorError}</span>
+          </p>
+        </Card>
+      )}
+
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           <CardSkeleton />
@@ -166,6 +248,10 @@ export default function MembersPage() {
           {members.map((m) => {
             const s = stats.get(m.id)!;
             const pct = percent(s.done, s.total);
+            const commits = commitsByMember.get(m.id);
+            // Dibedakan dari 0: undefined berarti belum tertaut ke akun
+            // GitHub mana pun, 0 berarti tertaut tapi belum pernah commit.
+            const tertaut = commits !== undefined;
 
             return (
               <Card key={m.id} className="flex flex-col">
@@ -207,18 +293,46 @@ export default function MembersPage() {
                   </div>
                 </div>
 
-                {m.github_username && (
-                  <a
-                    href={`https://github.com/${m.github_username}`}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium text-ink-2 transition hover:bg-line"
-                  >
-                    <GithubIcon className="size-3.5" />@{m.github_username}
-                  </a>
-                )}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  {m.github_username ? (
+                    <a
+                      href={`https://github.com/${m.github_username}`}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      className="glass-chip inline-flex w-fit items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium text-ink-2 transition hover:brightness-125"
+                    >
+                      <GithubIcon className="size-3.5" />@{m.github_username}
+                    </a>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-[var(--tone-amber-soft)] px-2.5 py-1 text-xs font-medium text-[var(--tone-amber-text)]">
+                      <AlertCircle className="size-3.5" /> belum tertaut GitHub
+                    </span>
+                  )}
 
-                <dl className="mt-4 grid grid-cols-3 gap-2 border-t border-line pt-4 text-center">
+                  {m.github_username && !tertaut && !loadingContributors && (
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-full bg-surface-3 px-2.5 py-1 text-xs font-medium text-muted"
+                      title="Username terisi, tapi akun ini tidak muncul di daftar kontributor repo"
+                    >
+                      bukan kontributor repo
+                    </span>
+                  )}
+                </div>
+
+                <dl className="mt-4 grid grid-cols-4 gap-2 border-t border-line pt-4 text-center">
+                  <div>
+                    <dt className="text-xs text-muted">Commit</dt>
+                    <dd
+                      className="text-lg font-semibold text-[var(--tone-green-text)]"
+                      title={
+                        tertaut
+                          ? "Jumlah commit di repo menurut GitHub"
+                          : "Belum tertaut ke akun GitHub"
+                      }
+                    >
+                      {tertaut ? commits : "—"}
+                    </dd>
+                  </div>
                   <div>
                     <dt className="text-xs text-muted">Tugas</dt>
                     <dd className="text-lg font-semibold text-ink">{s.total}</dd>

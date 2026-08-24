@@ -94,6 +94,63 @@ export interface BranchSummary {
   error: string | null;
 }
 
+/** Satu kontributor repo menurut GitHub, bukan menurut data lokal. */
+export interface Contributor {
+  login: string;
+  /** Nama tampilan di profil GitHub; null kalau pengguna tidak mengisinya. */
+  name: string | null;
+  avatar_url: string;
+  commits: number;
+  profile_url: string;
+}
+
+export type RepoEventKind =
+  | "push"
+  | "branch_create"
+  | "branch_delete"
+  | "tag_create"
+  | "pr_open"
+  | "pr_merge"
+  | "pr_close"
+  | "review"
+  | "issue"
+  | "release"
+  | "fork"
+  | "star"
+  | "member_add"
+  | "other";
+
+/** Satu baris riwayat aktivitas repo, sudah dinormalkan dari event GitHub. */
+export interface RepoEvent {
+  id: string;
+  kind: RepoEventKind;
+  actor_login: string | null;
+  title: string;
+  detail: string | null;
+  branch: string | null;
+  date: string;
+  url: string | null;
+  /** Jumlah commit — hanya terisi untuk event push. */
+  count: number | null;
+}
+
+export const REPO_EVENT_LABEL: Record<RepoEventKind, string> = {
+  push: "Push",
+  branch_create: "Branch dibuat",
+  branch_delete: "Branch dihapus",
+  tag_create: "Tag dibuat",
+  pr_open: "PR dibuka",
+  pr_merge: "PR di-merge",
+  pr_close: "PR ditutup",
+  review: "Review PR",
+  issue: "Issue",
+  release: "Release",
+  fork: "Fork",
+  star: "Star",
+  member_add: "Kolaborator baru",
+  other: "Aktivitas",
+};
+
 export const BRANCH_REVIEW_LABEL: Record<BranchReviewStatus, string> = {
   pending: "Menunggu Review",
   approved: "Disetujui",

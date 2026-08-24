@@ -11,6 +11,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Select } from "@/components/ui/Field";
 import { GithubIcon } from "@/components/ui/GithubIcon";
 import { CardSkeleton } from "@/components/ui/Skeleton";
+import { RepoTimeline } from "@/components/activity/RepoTimeline";
 import { ACCENT, formatDate, percent, relativeDays } from "@/lib/ui";
 import { cn } from "@/lib/cn";
 import type { Commit, Member } from "@/lib/types";
@@ -315,6 +316,14 @@ export default function ActivityPage() {
                 </div>
               )}
             </Card>
+
+            {/*
+              Timeline event menjawab pertanyaan yang berbeda dari daftar
+              commit: bukan "apa yang diubah" tapi "apa yang terjadi" —
+              branch dibuat, PR di-merge, release. Ditaruh di kolom kiri
+              supaya sejajar dengan ringkasan kontribusi di atasnya.
+            */}
+            <RepoTimeline repoUrl={activeRepo} reloadKey={reloadKey} />
           </div>
 
           <Card className="lg:col-span-2">
